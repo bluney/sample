@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+
+<link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" />
+<link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet" />
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/html5shiv.js"></script>
+<![endif]-->
+
+<!-- Fav and touch icons -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://getbootstrap.com/2.3.2/assets/ico/apple-touch-icon-144-precomposed.png" />
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://getbootstrap.com/2.3.2/assets/ico/apple-touch-icon-114-precomposed.png" />
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://getbootstrap.com/2.3.2/assets/ico/apple-touch-icon-72-precomposed.png" />
+<link rel="apple-touch-icon-precomposed" href="http://getbootstrap.com/2.3.2/assets/ico/apple-touch-icon-57-precomposed.png" />
+<link rel="shortcut icon" href="http://getbootstrap.com/2.3.2/assets/ico/favicon.png" />
+
+<title th:text="${navigation.name}" />
+
+<style type="text/css">
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+
+.highlight {
+	background-color: yellow;
+}
+
+button {
+	background: blue;
+	color: white;
+}
+
+</style>
+<!-- Le styles -->
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://malsup.github.com/jquery.form.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" th:inline="javascript">
+	$(document).ready(function() {
+		//alert("넘어감"); 	
+
+	});
+
+	function winCentre() {
+		
+		if (document.layers) {
+			var sinist = screen.width / 2 - outerWidth / 2;
+			var toppo = screen.height / 2 - outerHeight / 2;
+		} else {
+			var sinist = screen.width / 2 - document.body.offsetWidth / 2;
+			var toppo = -75 + screen.height / 2 - document.body.offsetHeight / 2;
+		}
+		
+		self.moveTo(sinist, toppo);
+
+	}
+
+	function inputExcel() {
+		/*<![CDATA[*/
+		var queryForm = document.getElementById("queryForm");
+		var file = $("#file").val();
+
+		if (file == "" || file == null) {
+			alert("파일을 선택하여 주세요.");
+			return false;
+		} else if (!checkFileType(file)) {
+			alert("엑셀파일(xls, xlsx)만 업로드 해주세요.");
+			return false;
+		} else {
+			queryForm.submit();
+			//window.close();
+		}
+		/*]]>*/
+	}
+
+	function checkFileType(filePath) {
+		var fileFormat = filePath.split(".");
+
+		if (fileFormat.indexOf("xlsx") > -1 || fileFormat.indexOf("xls") > -1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/* 	function check() {
+
+	 var file = $("#file").val();
+	
+	 if (file == "" || file == null) {
+	 alert("파일을 선택하여 주세요.");
+	 return false;
+	 } else if (!checkFileType(file)) {
+
+	 alert("엑셀파일(xlsx)만 업로드 해주세요.");
+	 return false;
+	 }
+
+	 if (confirm("업로드 하시겠습니까?")) {
+
+	
+	 $("#queryForm").attr("action", "/scm/service/bom/importExcel");
+	
+	 var options = {
+	
+	 success : function(data) {
+	
+	 alert("모든 데이터가 업로드 되었습니다.");
+	 $("#ajax-content").html(data);
+	 },
+	 type : "POST"
+	 };
+	 alert("123456789");
+	
+	 $("form").ajaxSubmit(options);
+	
+	 alert("11111");
+	 }
+	 }  */
+</script>
+</head>
+<body onLoad="winCentre()">
+	<div class="container">
+		<div class="row-fluid">
+			<form th:action="${upload_base_url}+'/importExcel'" enctype="multipart/form-data" th:object="${excelUploadFile}" id="queryForm" method="post">
+				<table class="table">
+					<thead>
+						<tr>
+							<th class="span2"></th>
+							<th class="span10"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="2">
+								<h4 th:text="${upload_file_info}"></h4>
+							</td>
+						</tr>
+						<tr>
+							<td>File :</td>
+							<td>
+								<input class="span12" type="file" id="file" name="file" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"/>
+							</td>
+						</tr>
+						<tr> 
+							<td colspan="2">
+								<input type="button" onclick="inputExcel();" class="btn btn-success pull-right" value="파일 데이터 업로드" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+		<!--/row-->
+		<hr />
+		<footer>
+		<p align="right">&copy;훈련체계 운영팀 선행연구 파트 2016</p>
+		</footer>
+
+	</div>
+	<!--/.fluid-container-->
+
+	<!-- Le javascript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="http://getbootstrap.com/2.3.2/assets/js/jquery.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>
+
+</body>
+</html>

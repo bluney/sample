@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:springfield="http://www.u2ware.com/schema/springfield"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc 
+		http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.u2ware.com/schema/springfield 
+		http://www.u2ware.com/schema/springfield/u2ware-springfield.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+<!-- 	<jdbc:embedded-database id="dataSource" type="HSQL" />
+ -->	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	    <property name="driverClass" value="org.postgresql.Driver"/>
+	    <property name="jdbcUrl" value="jdbc:postgresql://localhost/sample"/>
+	    <property name="user" value="postgres"/>
+	    <property name="password" value="postgres"/>
+	</bean>	
+	
+	<util:properties id="prop" location="classpath:bluney/sample/sample/root-context.properties" />
+		
+	<!-- 
+	############################################################# 
+	# component-scan (springfield 의 자동 생성 빈을 교체하기 위해서는 springfield:modules 보다 앞쪽에 선언되어야 함) package scan. 
+	############################################################# 
+	-->
+	<context:component-scan base-package="bluney.sample.sample" />
+
+	<!-- 
+	############################################################# 
+	# springfield 
+	############################################################# 
+	-->
+	<springfield:modules base-package="bluney.sample.sample" data-source-ref="dataSource" />
+	
+</beans>
