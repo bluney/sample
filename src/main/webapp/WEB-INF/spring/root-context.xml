@@ -21,15 +21,16 @@
 		http://www.u2ware.com/schema/springfield/u2ware-springfield.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
-<!-- 	<jdbc:embedded-database id="dataSource" type="HSQL" />
- -->	
+	<jdbc:embedded-database id="dataSource" type="HSQL" />
+	
+<!-- 
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 	    <property name="driverClass" value="org.postgresql.Driver"/>
 	    <property name="jdbcUrl" value="jdbc:postgresql://localhost/sample"/>
 	    <property name="user" value="postgres"/>
 	    <property name="password" value="postgres"/>
 	</bean>	
-	
+ -->	
 	<util:properties id="prop" location="classpath:bluney/sample/sample/root-context.properties" />
 		
 	<!-- 

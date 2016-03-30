@@ -68,71 +68,66 @@
   </nav>
 
   <div class="container">
-    <div class="row-fluid">
+    <div class="jumbotron">
       <div class="span12">
-        <div class="hero-unit">
-          <h1 align="left">TEST</h1>
-          <p>SAMPLE PROJECT.</p>
-        </div>
-
+        <h1 align="left">TEST</h1>
+        <p>SAMPLE PROJECT.</p>
       </div>
     </div>
 
-    <div class="row-fluid">
-      <div class="span12">
-        <div class="hero-unit" align="right">
+    <div class="container">
+      <div class="jumbotron">
+        <form th:unless="${principal}" th:action="@{'/j_spring_security_check'}" method="post" class="form-horizontal border-example">
 
-          <form th:unless="${principal}" th:action="@{'/j_spring_security_check'}" method="post" class="form-horizontal border-example">
+          <h2 class="form-signin-heading">Please sign in</h2>
 
-            <h2 class="form-signin-heading">Please sign in</h2>
+              <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          <input type="email" id="pageNumber" name="j_username" value="" class="form-control" placeholder="Email address" required autofocus />
+          <input type="password" id="pageNumber" name="j_password" value="" class="form-control" placeholder="Password" required />
 
-            <div>
-              ID
-              <input type="text" id="pageNumber" name="j_username" value="" placeholder="" required="required" autofocus="autofocus" />
-            </div>
-            <div>
-              PASSWORD
-              <input type="password" id="pageNumber" name="j_password" value="" placeholder="Password" required="required" />
-            </div>
-
-            <div style="margin: 3px 0px 0px 0px;">
-              <button type="submit" style="width: 220px;">로그인</button>
-            </div>
-            <div style="margin: 0px;">
-              <button type="submit" style="width: 107px;">접속초기화</button>
-              <button type="button" style="width: 108px;" onclick="location.href ='/sample/security/user/forgot/new.html'">PASSWORD</button>
-            </div>
-            <div style="margin: 3px 0px;">
-              <button type="button" style="width: 220px;" onclick="location.href ='/sample/security/user/register/new.html'">회원가입</button>
-            </div>
-          </form>
-          <form th:if="${principal}" th:action="@{'/j_spring_security_logout'}" method="get" class="form-horizontal border-example">
-            <div th:class="'control-group '+ (${errorCode} ? ' error')" th:if="${errorCode}">
-              <div class="controls">
-                <span class="help-inline" th:text="${errorCode}"></span>
-              </div>
-              <p>비밀번호 입력이 잘못되었습니다.</p>
-            </div>
-            <h1></h1>
-            <h2 align="left">환영합니다~</h2>
-            <div class="controls">사용자</div>
-            <p th:text="${principal.username}" />
-
-            <!-- <label class="control-label">사용자 권한</label> -->
+          <div class="checkbox">
+            <label> <input type="checkbox" value="remember-me"> Remember me </label>
+          </div>
+          
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          
+          <div style="margin: 3px 0px 0px 0px;">
+            <button type="submit" style="width: 220px;">로그인</button>
+          </div>
+          <div style="margin: 0px;">
+            <button type="submit" style="width: 107px;">접속초기화</button>
+            <button type="button" style="width: 108px;" onclick="location.href ='/sample/security/user/forgot/new.html'">PASSWORD</button>
+          </div>
+          <div style="margin: 3px 0px;">
+            <button type="button" style="width: 220px;" onclick="location.href ='/sample/security/user/register/new.html'">회원가입</button>
+          </div>
+        </form>
+        <form th:if="${principal}" th:action="@{'/j_spring_security_logout'}" method="get" class="form-horizontal border-example">
+          <div th:class="'control-group '+ (${errorCode} ? ' error')" th:if="${errorCode}">
             <div class="controls">
-              사용자 권한
-              <p th:text="${principal.role}" />
+              <span class="help-inline" th:text="${errorCode}"></span>
             </div>
+            <p>비밀번호 입력이 잘못되었습니다.</p>
+          </div>
+          <h1></h1>
+          <h2 align="left">환영합니다~</h2>
+          <div class="controls">사용자</div>
+          <p th:text="${principal.username}" />
 
-            <div class="control-group">
-              <div class="controls">
-                <button type="button" style="width: 100px;" onclick="location.href ='/sample/security/member/info/who/edit.html'">메인으로</button>
-                <input type="submit" value="Logout" style="width: 100px;" />
-              </div>
+          <!-- <label class="control-label">사용자 권한</label> -->
+          <div class="controls">
+            사용자 권한
+            <p th:text="${principal.role}" />
+          </div>
+
+          <div class="control-group">
+            <div class="controls">
+              <button type="button" style="width: 100px;" onclick="location.href ='/sample/security/member/info/who/edit.html'">메인으로</button>
+              <input type="submit" value="Logout" style="width: 100px;" />
             </div>
+          </div>
 
-          </form>
-        </div>
+        </form>
       </div>
     </div>
 

@@ -1,12 +1,8 @@
 <navigation path="/index.html" name="sample">
-<!--
-	<navigation pattern="/service/bigdata/**" path="/service/bigdata/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="빅데이터">
-	
+	<navigation pattern="/service/bigdata/**" path="/service/bigdata/map_daum_sample.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="빅데이터">
 	</navigation>
- -->
 	
-	<navigation pattern="/service/market/**" path="/service/market" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="시장동향">
-		<navigation pattern="/service/market" name="시장동향" />
+	<navigation pattern="/service/market/**" path="/service/market/market.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="시장동향">
 	</navigation>
 
 <!--

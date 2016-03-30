@@ -22,10 +22,24 @@ public class AjaxController {
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
-	@RequestMapping(value = "/resource/ajax/dashboard.html", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
+	@RequestMapping(value = "/ajax/dashboard.html", method = RequestMethod.GET)
+	public String dashboard(Locale locale, Model model) {
 	
 		return "/ajax/dashboard";
 //		return "/loginForm";
 	}
+	
+	@RequestMapping(value = "/service/bigdata/map_daum_sample.html", method = RequestMethod.GET)
+	public String sampleDaumMap(Locale locale, Model model) {
+	
+		return "/service/bigdata/map_daum_sample";
+	}
+	
+	@RequestMapping(value = "/service/market/market.html", method = RequestMethod.GET)
+	public String sampleMarket(Locale locale, Model model) {
+	
+		return "/service/market/market.html";
+	}
+	
+
 }

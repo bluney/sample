@@ -46,7 +46,7 @@ public class LoginController {
 		logger.debug("principal : "+ principal);
 		logger.debug("errorCode : "+ errorCode);
 		
-		return "index";
+		return "loginForm";
 	}
 	
 /*	

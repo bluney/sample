@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>DevOOPS</title>
+<title>SAMPLE</title>
 <meta charset="utf-8" />
 <meta name="description" content="description" />
 <meta name="author" content="DevOOPS" />
@@ -16,6 +16,7 @@
 <link th:href="@{/resources/plugins/fullcalendar/fullcalendar.css}" rel="stylesheet" />
 <link th:href="@{/resources/plugins/xcharts/xcharts.min.css}" rel="stylesheet" />
 <link th:href="@{/resources/plugins/select2/select2.css}" rel="stylesheet" />
+<link th:href="@{/resources/css/map_daum_sample.css}" rel="stylesheet" />
 <link th:href="@{/resources/css/style.css}" rel="stylesheet" />
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -25,6 +26,9 @@
 </head>
 
 <body>
+<script type="text/javascript"
+	th:src="@{https://apis.daum.net/maps/maps3.js(apikey='ce2c8c6d7f79d2ad8464165fcd97e943',libraries='services')}"></script>
+
 <!--Start Header-->
 <div id="screensaver">
 	<canvas id="canvas"></canvas>
@@ -149,7 +153,7 @@
 		<div id="sidebar-left" class="col-xs-2 col-sm-2">
 			<ul class="nav main-menu">
 				<li class="dropdown" th:each="n1 : ${navigation.children}" th:if="${!n1.hide}" th:class="${not #lists.isEmpty(n1.children)} ? 'dropdown'">
-					<a th:if="${#lists.isEmpty(n1.children)}" th:href="${n1.path}" th:class="${n1.selected} ? 'active'">
+					<a th:if="${#lists.isEmpty(n1.children)}" th:href="${n1.path}" th:class="${n1.selected} ? 'active':'' + 'ajax-link'">
 						<i class="fa fa-bar-chart-o"></i>
 						<span class="hidden-xs" th:text="${n1.name}">Charts</span>
 					</a>
