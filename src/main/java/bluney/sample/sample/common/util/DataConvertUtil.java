@@ -17,4 +17,20 @@ public class DataConvertUtil {
 			return null;
 		}
 	}
+	
+	public static Long stringToLong(String str) {
+		try {
+			return Long.parseLong(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+	
+	public static Double stringToDouble(String str) {
+		try {
+			return Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 }

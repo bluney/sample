@@ -212,63 +212,34 @@ public class ImportExcel {
 		
 		String ret;
 		
-		if(cell.getClass() == HSSFCell.class) {
-			switch (cell.getCellType()) {
+		switch (cell.getCellType()) {
+		case Cell.CELL_TYPE_BLANK:
+			ret = "";
+			break;
+		case Cell.CELL_TYPE_BOOLEAN:
+			ret = String.valueOf(cell.getBooleanCellValue());
+			break;
+		case Cell.CELL_TYPE_ERROR:
+			ret = null;
+			break;
+		case Cell.CELL_TYPE_NUMERIC:
+			double cellvalue = cell.getNumericCellValue();
 
-			case HSSFCell.CELL_TYPE_BLANK:
-				ret = "";
-				break;
-			case HSSFCell.CELL_TYPE_BOOLEAN:
-				ret = String.valueOf(cell.getBooleanCellValue());
-				break;
-			case HSSFCell.CELL_TYPE_ERROR:
-				ret = null;
-				break;
-			case HSSFCell.CELL_TYPE_NUMERIC:
-				if (HSSFDateUtil.isCellDateFormatted(cell) || cell.getCellStyle().getDataFormat()==179) {
-	            		SimpleDateFormat sdf = new SimpleDateFormat(SimpleDateUtil.BOTH);            		
-						ret = sdf.format(cell.getDateCellValue()); 
-				}else{
-						ret = cell.getNumericCellValue() + "";
-				}            	             
-	            break;  
-			case HSSFCell.CELL_TYPE_STRING:
-				ret = cell.getStringCellValue();
-				break;
-			default:
-				ret = null;
-			}			
-		}
-		
-		else {
-			switch (cell.getCellType()) {
-			case Cell.CELL_TYPE_BLANK:
-				ret = "";
-				break;
-			case Cell.CELL_TYPE_BOOLEAN:
-				ret = String.valueOf(cell.getBooleanCellValue());
-				break;
-			case Cell.CELL_TYPE_ERROR:
-				ret = null;
-				break;
-			case Cell.CELL_TYPE_NUMERIC:
-				double cellvalue = cell.getNumericCellValue();
-
-				if (org.apache.poi.ss.usermodel.DateUtil.isValidExcelDate(cellvalue)
-						|| cell.getCellStyle().getDataFormat() == 179) {
-					SimpleDateFormat sdf = new SimpleDateFormat(SimpleDateUtil.BOTH);
-					ret = sdf.format(cell.getDateCellValue());
-				} else {
-					ret = cellvalue + "";
-				}
-				break;
-			case Cell.CELL_TYPE_STRING:
-				ret = cell.getStringCellValue();
-				break;
-			default:
-				ret = null;
+			if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)
+					|| cell.getCellStyle().getDataFormat() == 179) {
+				SimpleDateFormat sdf = new SimpleDateFormat(SimpleDateUtil.BOTH);
+				ret = sdf.format(cell.getDateCellValue());
+			} else {
+				ret = cellvalue + "";
 			}
+			break;
+		case Cell.CELL_TYPE_STRING:
+			ret = cell.getStringCellValue();
+			break;
+		default:
+			ret = null;
 		}
+
 		return ret;
 	}
 }

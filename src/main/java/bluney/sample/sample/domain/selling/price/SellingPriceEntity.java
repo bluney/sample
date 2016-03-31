@@ -28,6 +28,6 @@ public @ToString @NoArgsConstructor @AllArgsConstructor class SellingPriceEntity
 	
 	private @Getter @Setter String code;			// 법정동 코드 
 	private @Getter @Setter @NotNull String classification;	// 행정구역 식별자
-	private @Getter @Setter @NotNull java.sql.Date date;	//
-	private @Getter @Setter @NotNull Long value;			// 매매 가격			
+	private @Getter @Setter @NotNull java.util.Date date;	//
+	private @Getter @Setter @NotNull Double value;			// 매매 가격			
 }

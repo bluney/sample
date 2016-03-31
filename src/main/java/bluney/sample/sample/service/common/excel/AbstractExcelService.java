@@ -35,6 +35,10 @@ public abstract class AbstractExcelService implements ExcelService{
 	}
 	
 	protected List<List<String>> parseExcelFile(CommonsMultipartFile file, int startRow, int startColumn) throws IOException {
+		return parseExcelFile(file, 0, startRow, startColumn, NOT_DEFINE, NOT_DEFINE);		
+	}
+	
+	protected List<List<String>> parseExcelFile(CommonsMultipartFile file, int sheetIndex, int startRow, int startColumn, int lastRow, int lastColumn) throws IOException {
 		List<List<String>> result = null;
 		
 		if (isValidExcelExtenstion(file)) {
@@ -43,7 +47,7 @@ public abstract class AbstractExcelService implements ExcelService{
 			String filePath = System.getProperty("java.io.tmpdir") + file.getOriginalFilename();
 			saveFile(file, filePath);
 			
-			result = ImportExcel.getExcelStringList(new File(filePath), startRow, startColumn);
+			result = ImportExcel.getExcelStringListAtIndex(new File(filePath), sheetIndex, startRow, startColumn, lastRow, lastColumn);
 		}
 		return result;		
 	}
@@ -68,7 +72,7 @@ public abstract class AbstractExcelService implements ExcelService{
 		return results;				
 	}
 	
-	abstract protected Object parseExcelRows(List<List<String>> sheet);
+	abstract protected Object parseExcelSheet(List<List<String>> sheet);
 	
 
 	abstract protected boolean isValidRow(List<String> list);
