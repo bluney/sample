@@ -24,6 +24,10 @@ import com.u2ware.springfield.repository.EntityRepository;
 
 import bluney.sample.sample.common.util.DataConvertUtil;
 import bluney.sample.sample.common.util.NullJudgeUtil;
+import bluney.sample.sample.customtype.market.Market;
+import bluney.sample.sample.customtype.market.MarketType;
+import bluney.sample.sample.domain.lease.price.LeasePriceEntity;
+import bluney.sample.sample.domain.lease.rate.LeaseRateEntity;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.domain.selling.rate.SellingRateEntity;
 import bluney.sample.sample.service.common.excel.AbstractExcelService;
@@ -44,12 +48,12 @@ public class MarketExcelService extends AbstractExcelService {
 	
 	private final static String DELIM_CLASSFICATION = "_";
 	
-//	@Autowired @Qualifier("leasePriceEntityRepository")
-//	private EntityRepository<LeasePriceEntity, Integer> leasePriceRepository;
-//
-//	@Autowired @Qualifier("leaseRateEntityRepository")
-//	private EntityRepository<LeaseRateEntity, Integer> leaseRateRepository;
-//
+	@Autowired @Qualifier("leasePriceEntityRepository")
+	private EntityRepository<LeasePriceEntity, Integer> leasePriceRepository;
+
+	@Autowired @Qualifier("leaseRateEntityRepository")
+	private EntityRepository<LeaseRateEntity, Integer> leaseRateRepository;
+
 	@Autowired @Qualifier("sellingPriceEntityRepository")
 	private EntityRepository<SellingPriceEntity, Integer> sellingPriceRepository;
 
@@ -69,6 +73,10 @@ public class MarketExcelService extends AbstractExcelService {
 		sellingPriceRepository.save(entities);
 		
 		return "";
+	}
+	
+	private <T extends Market> void importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) throws IOException {
+		
 	}
 	
 	@Override

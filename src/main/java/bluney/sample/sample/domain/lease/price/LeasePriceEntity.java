@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import com.u2ware.springfield.config.Springfield;
 import com.u2ware.springfield.config.Springfield.Strategy;
 
+import bluney.sample.sample.customtype.market.Market;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.ToString;
 @Springfield(strategy=Strategy.HIBERNATE)
 @Entity
 @Table(name="lease_price")
-public @ToString @NoArgsConstructor @AllArgsConstructor class LeasePriceEntity {
+public @ToString @NoArgsConstructor @AllArgsConstructor class LeasePriceEntity extends Market {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_LEASE_PRICE_PK_SYNC")
 	@SequenceGenerator(name="SEQ_LEASE_PRICE_PK_SYNC", sequenceName="SEQ_LEASE_PRICE_PK_SYNC")

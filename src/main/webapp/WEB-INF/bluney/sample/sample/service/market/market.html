@@ -29,115 +29,7 @@
 				<div class="no-move"></div>
 			</div>
 			<div class="box-content">
-				<button type="button" class="btn btn-default">Import 시계열 Data</button>
-			</div>
-			<div class="box-content no-padding">
-				<table class="table table-bordered table-striped table-hover table-heading table-datatable" id="datatable-1">
-					<thead>
-						<tr>
-							<th>Rank</th>
-							<th>Name</th>
-							<th>Net Worth</th>
-							<th>Age</th>
-							<th>Source</th>
-							<th>Country of Citizenship</th>
-						</tr>
-					</thead>
-					<tbody>
-					<!-- Start: list_row -->
-						<tr>
-							<td>1</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/carlos-slim-helu_50x50.jpg" alt="" />Carlos Slim Helu family</td>
-							<td>$73 B</td>
-							<td>74</td>
-							<td>telecom</td>
-							<td>Mexico</td>
-						</tr>
-						<tr>
-							<td>2</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/bill-gates_50x50.jpg" alt="" />Bill Gates</td>
-							<td>$67 B</td>
-							<td>58</td>
-							<td>Microsoft</td>
-							<td>United States</td>
-						</tr>
-						<tr>
-							<td>3</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/amancio-ortega_50x50.jpg" alt="" />Amancio Ortega</td>
-							<td>$57 B</td>
-							<td>77</td>
-							<td>Zara</td>
-							<td>Spain</td>
-						</tr>
-						<tr>
-							<td>4</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/warren-buffett_50x50.jpg" alt="" />Warren Buffett</td>
-							<td>$53.5 B</td>
-							<td>83</td>
-							<td>Berkshire Hathaway</td>
-							<td>United States</td>
-						</tr>
-						<tr>
-							<td>5</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/larry-ellison_50x50.jpg" alt="" />Larry Ellison</td>
-							<td>$43 B</td>
-							<td>69</td>
-							<td>Oracle</td>
-							<td>United States</td>
-						</tr>
-						<tr>
-							<td>6</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/charles-koch_50x50.jpg" alt="" />Charles Koch</td>
-							<td>$34 B</td>
-							<td>78</td>
-							<td>diversified</td>
-							<td>United States</td>
-						</tr>
-						<tr>
-							<td>6</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/david-koch_50x50.jpg" alt="" />David Koch</td>
-							<td>$34 B</td>
-							<td>73</td>
-							<td>diversified</td>
-							<td>United States</td>
-						</tr>
-						<tr>
-							<td>8</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/li-ka-shing_50x50.jpg" alt="" />Li Ka-shing</td>
-							<td>$31 B</td>
-							<td>85</td>
-							<td>diversified</td>
-							<td>Hong Kong</td>
-						</tr>
-						<tr>
-							<td>9</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/liliane-bettencourt_50x50.jpg" alt="" />Liliane Bettencourt family</td>
-							<td>$30 B</td>
-							<td>91</td>
-							<td>L'Oreal</td>
-							<td>France</td>
-						</tr>
-						<tr>
-							<td>10</td>
-							<td><img class="img-rounded" src="http://i.forbesimg.com/media/lists/people/bernard-arnault_50x50.jpg" alt="" />Bernard Arnault family</td>
-							<td>$29 B</td>
-							<td>64</td>
-							<td>LVMH</td>
-							<td>France</td>
-						</tr>
-					<!-- End: list_row -->
-					</tbody>
-					<tfoot>
-						<tr>
-							<th>Rank</th>
-							<th>Name</th>
-							<th>Net Worth</th>
-							<th>Age</th>
-							<th>Source</th>
-							<th>Country of Citizenship</th>
-						</tr>
-					</tfoot>
-				</table>
+				<button type="button" class="btn btn-default" onclick="importExcel()">Import 시계열 Data</button>
 			</div>
 		</div>
 	</div>
@@ -676,6 +568,11 @@
 	</div>
 </div>
 <script type="text/javascript">
+function importExcel(){
+	  var specs = "left=10,top=10,width=900,height=600";
+	  specs += ",toolbar=no,menubar=no,status=no,scrollbars=no,resizable=no";
+	  window.open("/service/market/requestExcel", "시계열자료 가져오기", specs);	
+}
 // Run Datables plugin and create 3 variants of settings
 function AllTables(){
 	TestTable1();
