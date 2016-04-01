@@ -16,7 +16,7 @@ import org.modelmapper.internal.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.View;
 
@@ -40,12 +40,6 @@ public class MarketExcelService extends AbstractExcelService {
 	private final static int LAST_ROW_IN_EXCEL_FILE = NOT_DEFINE;	// 엑셀의 row 마지막 위치 
 	private final static int LAST_COLUMN_IN_EXCEL_FILE = 188;		// 엑셀의 column 마지막 위치
 
-	private final static int SHEET_IDX_OF_SELLING_PRICE = 0;
-	private final static int SHEET_IDX_OF_SELLING_RATE 	= 1;
-	private final static int SHEET_IDX_OF_LEASE_PRICE 	= 2;
-	private final static int SHEET_IDX_OF_LEASERATE 	= 3;
-
-	
 	private final static String DELIM_CLASSFICATION = "_";
 	
 	@Autowired @Qualifier("leasePriceEntityRepository")
@@ -61,38 +55,67 @@ public class MarketExcelService extends AbstractExcelService {
 	private EntityRepository<SellingRateEntity, Integer> sellingRateRepository;
 
 	@Override
-	public String importExcel(CommonsMultipartFile file) throws IOException {
+	public String importExcel(CommonsMultipartFile file) {
 		
 		setStartRow(START_ROW_IN_EXCEL_FILE);
 		setStartColumn(START_COLUMN_IN_EXCEL_FILE);
 		
-		List<List<String>> sheet = parseExcelFile(file, SHEET_IDX_OF_SELLING_PRICE, getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
-		List<SellingPriceEntity> entities = parseExcelSheet(sheet);
+//		List<List<String>> sheet = parseExcelFile(file, SHEET_IDX_OF_SELLING_PRICE, getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
+//		List<SellingPriceEntity> entities = parseExcelSheet(sheet);
+//
+//		sellingPriceRepository.deleteAll();
+//		sellingPriceRepository.save(entities);
 
-		sellingPriceRepository.deleteAll();
-		sellingPriceRepository.save(entities);
+		try {
+			importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		return "";
 	}
 	
 	private <T extends Market> void importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) throws IOException {
-		
+		List<List<String>> sheet = parseExcelFile(file, type.getCode(), getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
+		List<T> entities = parseMarketExcelSheet(sheet, type);
+
+		repository.deleteAll();
+		repository.save(entities);
 	}
+
+
 	
 	@Override
-	public View exportExcel(ModelMap model, HttpServletRequest request, HttpServletResponse response)
+	public View exportExcel(Model model, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected List<SellingPriceEntity> parseExcelSheet(List<List<String>> sheet) {
+	protected Object parseExcelSheet(List<List<String>> sheet) {
+		// not used
+		return null;
+	}
+
+	@Override
+	protected boolean isValidRow(List<String> list) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	
+	private <T extends Market> List<T> parseMarketExcelSheet(List<List<String>> sheet, MarketType type) {
 		
 		SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Map<Integer, String> classificationMap = makeClassification(sheet);
 		
-		List<SellingPriceEntity> result = new ArrayList<SellingPriceEntity>();
+		List<T> result = new ArrayList<T>();
 		List<List<String>> dataSheet = sheet.subList(3, sheet.size());		
 		for(List<String> row : dataSheet) {
 			
@@ -101,7 +124,8 @@ public class MarketExcelService extends AbstractExcelService {
 				
 				int size = row.size();
 				for(int i=1; i<size; i++) {
-					SellingPriceEntity entity = new SellingPriceEntity();
+					@SuppressWarnings("unchecked")
+					T entity = (T) createInstanceOfMarket(type);
 					entity.setDate(date);
 					entity.setClassification(classificationMap.get(i));
 					entity.setValue(DataConvertUtil.stringToDouble(row.get(i)));
@@ -117,11 +141,27 @@ public class MarketExcelService extends AbstractExcelService {
 		
 		return result;
 	}
-
-	@Override
-	protected boolean isValidRow(List<String> list) {
-		// TODO Auto-generated method stub
-		return false;
+	
+	private Market createInstanceOfMarket(MarketType type) {
+		Market instance = null;
+		switch(type) {
+		case SELLING_PRICE :
+			instance = new SellingPriceEntity();
+			break;
+		case SELLING_RATE :
+			instance = new SellingRateEntity();
+			break;
+		case LEASE_PRICE :
+			instance = new LeasePriceEntity();
+			break;
+		case LEASE_RATE :
+			instance = new LeaseRateEntity();
+			break;		
+		default :
+			break;
+		}
+		
+		return instance;
 	}
 	
 	private Map<Integer, String> makeClassification(List<List<String>> sheet) {

@@ -30,6 +30,7 @@
 			</div>
 			<div class="box-content">
 				<button type="button" class="btn btn-default" onclick="importExcel()">Import 시계열 Data</button>
+				<button type="button" class="btn btn-default" onclick="analyzeMarketTimeSeries()">시계열 Data 분석</button>
 			</div>
 		</div>
 	</div>
@@ -569,10 +570,15 @@
 </div>
 <script type="text/javascript">
 function importExcel(){
-	  var specs = "left=10,top=10,width=900,height=600";
-	  specs += ",toolbar=no,menubar=no,status=no,scrollbars=no,resizable=no";
-	  window.open("/service/market/requestExcel", "시계열자료 가져오기", specs);	
+	var specs = "left=10,top=10,width=900,height=600";
+	specs += ",toolbar=no,menubar=no,status=no,scrollbars=no,resizable=no";
+	window.open("/service/market/requestExcel", "시계열자료 가져오기", specs);	
 }
+
+function analyzeMarketTimeSeries(){
+	
+}
+
 // Run Datables plugin and create 3 variants of settings
 function AllTables(){
 	TestTable1();

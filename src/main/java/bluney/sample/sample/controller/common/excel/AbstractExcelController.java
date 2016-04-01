@@ -29,7 +29,7 @@ public abstract class AbstractExcelController implements ExcelController, Handle
 	// 
 	////////////////////////////////////////
 	@Override
-	public View exportExcel(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
+	public View exportExcel(Model model, HttpServletRequest request, HttpServletResponse response) {
 		
 		View view = null;
 		try {
@@ -61,15 +61,19 @@ public abstract class AbstractExcelController implements ExcelController, Handle
 	
 	
 	@Override
-	public String importExcel(UploadFile model, BindingResult result) throws IOException {
+	public String importExcel(UploadFile fileObject, Model model, HttpServletRequest request, BindingResult result) throws IOException {
 		logger.warn("request method: importExcel()");	
 
-		// TODO Auto-generated method stub
 		if (!result.hasErrors()) {
-			return  getExcelService().importExcel(model.getFile());
+			getExcelService().importExcel(fileObject.getFile());
+			model.addAttribute(UPLOAD_RESPONSE_RESULT, "success");
+		} else {
+			model.addAttribute(UPLOAD_RESPONSE_RESULT, "failure");
 		}
 		
-		return "";
+		logger.debug(request.getRequestURL().toString());
+		
+		return request.getRequestURL().toString();
 	}
 	
 	@Override
