@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.View;
 
@@ -53,9 +56,9 @@ public class MarketExcelService extends AbstractExcelService {
 
 	@Autowired @Qualifier("sellingRateEntityRepository")
 	private EntityRepository<SellingRateEntity, Integer> sellingRateRepository;
-
+	
 	@Override
-	public String importExcel(CommonsMultipartFile file) {
+	public Boolean importExcel(CommonsMultipartFile file, BindingResult result) {
 		
 		setStartRow(START_ROW_IN_EXCEL_FILE);
 		setStartColumn(START_COLUMN_IN_EXCEL_FILE);
@@ -69,15 +72,19 @@ public class MarketExcelService extends AbstractExcelService {
 		try {
 			importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
 		} catch (IOException e) {
+			ObjectError error = new ObjectError("importMarketExcel", "IOException Error: importMarketExcel- MarketType.SELLING_PRICE 실패");
+			result.addError(error);
 			e.printStackTrace();
 		}
 		try {
 			importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
 		} catch (IOException e) {
+			ObjectError error = new ObjectError("importMarketExcel", "IOException Error: importMarketExcel- MarketType.SELLING_RATE 실패");
+			result.addError(error);
 			e.printStackTrace();
 		}
 		
-		return "";
+		return result.hasErrors() ? false : true;
 	}
 	
 	private <T extends Market> void importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) throws IOException {

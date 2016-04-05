@@ -20,7 +20,9 @@ public interface ExcelController {
 	public final static String UPLOAD_FILE_INFO		= "upload_file_info";
 	public final static String UPLOAD_BASE_URL		= "upload_base_url";
 	
-	public final static String UPLOAD_RESPONSE_RESULT	= "upload_response_result";
+	public final static String MODEL_MESSAGE = "model_message";
+	public final static String MODEL_MESSAGE_RESPONSE  = "model_message_response";
+	public final static String MODEL_MESSAGE_RESPONSE_SUCCESS  = "model_message_response_success";
 	
 	@RequestMapping(value = "/exportExcel", method = RequestMethod.POST)	
 	public View exportExcel(Model model, HttpServletRequest request, HttpServletResponse response);

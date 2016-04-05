@@ -93,6 +93,11 @@ button {
 			return false;
 		}
 	}
+	
+	function complete() {
+		opener.location.reload();
+		window.close();
+	}
 
 	/* 	function check() {
 
@@ -133,7 +138,7 @@ button {
 <body onLoad="winCentre()">
 	<div class="container">
 		<div class="row-fluid">
-			<form th:action="${upload_base_url}+'/importExcel'" enctype="multipart/form-data" th:object="${upload_file_entity}" id="queryForm" method="post">
+			<form th:unless="${model_message}" th:action="${upload_base_url}+'/importExcel'" enctype="multipart/form-data" th:object="${upload_file_entity}" id="queryForm" method="post">
 				<table class="table">
 					<thead>
 						<tr>
@@ -158,14 +163,14 @@ button {
 								<input type="button" onclick="inputExcel();" class="btn btn-primary pull-right" value="파일 데이터 업로드" />
 							</td>
 						</tr>
-						<tr th:if="upload_response_result">
-							<button th:if="upload_response_result" type="button" onclick="complete();" class="btn btn-success pull-center" value="업로드 성공" />
-							
-						</tr> 
+
 					</tbody>
 				</table>
 			</form>
-			
+			<div th:if="${model_message}" >
+				<button th:if="${model_message.model_message_response_success}==true" type="button" onclick="complete();" class="btn btn-success pull-center" value="IMPORT 성공" />
+				<button th:unless="${model_message.model_message_response_success}==true" type="button" onclick="complete();" class="btn btn-danger pull-center" value="IMPORT 실패" />
+			</div>
 		</div>
 		<!--/row-->
 		<hr />

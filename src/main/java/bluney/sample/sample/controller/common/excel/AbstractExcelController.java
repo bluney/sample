@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
@@ -63,15 +62,17 @@ public abstract class AbstractExcelController implements ExcelController, Handle
 	@Override
 	public String importExcel(UploadFile fileObject, Model model, HttpServletRequest request, BindingResult result) throws IOException {
 		logger.warn("request method: importExcel()");	
-
+		Map<String,Object> m = new HashMap<String,Object>();
+				
 		if (!result.hasErrors()) {
-			getExcelService().importExcel(fileObject.getFile());
-			model.addAttribute(UPLOAD_RESPONSE_RESULT, "success");
+			Boolean isSuccess = getExcelService().importExcel(fileObject.getFile(), result);
+			m.put(MODEL_MESSAGE_RESPONSE_SUCCESS, isSuccess);
 		} else {
-			model.addAttribute(UPLOAD_RESPONSE_RESULT, "failure");
+			m.put(MODEL_MESSAGE_RESPONSE_SUCCESS, false);
 		}
 		
 		logger.debug(request.getRequestURL().toString());
+		model.addAttribute(MODEL_MESSAGE, m);
 		
 		return request.getRequestURL().toString();
 	}

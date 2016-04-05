@@ -28,12 +28,8 @@ public abstract class AbstractExcelService implements ExcelService{
 //	public String exportExcel(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
 //		return "";
 //	}
-	
-	@Override
-	public String importExcel(CommonsMultipartFile file) throws IOException {
-		return "";
-	}
-	
+
+
 	protected List<List<String>> parseExcelFile(CommonsMultipartFile file, int startRow, int startColumn) throws IOException {
 		return parseExcelFile(file, 0, startRow, startColumn, NOT_DEFINE, NOT_DEFINE);		
 	}
