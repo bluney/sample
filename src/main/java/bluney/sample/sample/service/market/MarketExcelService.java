@@ -41,7 +41,7 @@ public class MarketExcelService extends AbstractExcelService {
 	private final static int START_ROW_IN_EXCEL_FILE = 1;			// 엑셀의 row 시작 위치
 	private final static int START_COLUMN_IN_EXCEL_FILE = 0;		// 엑셀의 column 시작 위치
 	private final static int LAST_ROW_IN_EXCEL_FILE = NOT_DEFINE;	// 엑셀의 row 마지막 위치 
-	private final static int LAST_COLUMN_IN_EXCEL_FILE = 188;		// 엑셀의 column 마지막 위치
+	private final static int LAST_COLUMN_IN_EXCEL_FILE = 5;//188;		// 엑셀의 column 마지막 위치
 
 	private final static String DELIM_CLASSFICATION = "_";
 	
@@ -69,30 +69,27 @@ public class MarketExcelService extends AbstractExcelService {
 //		sellingPriceRepository.deleteAll();
 //		sellingPriceRepository.save(entities);
 
-		try {
-			importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
-		} catch (IOException e) {
-			ObjectError error = new ObjectError("importMarketExcel", "IOException Error: importMarketExcel- MarketType.SELLING_PRICE 실패");
-			result.addError(error);
-			e.printStackTrace();
-		}
-		try {
-			importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
-		} catch (IOException e) {
-			ObjectError error = new ObjectError("importMarketExcel", "IOException Error: importMarketExcel- MarketType.SELLING_RATE 실패");
-			result.addError(error);
-			e.printStackTrace();
-		}
+		boolean isSuccess = true;
+		isSuccess &= importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
+		isSuccess &= importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
 		
-		return result.hasErrors() ? false : true;
+		return isSuccess;
 	}
 	
-	private <T extends Market> void importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) throws IOException {
-		List<List<String>> sheet = parseExcelFile(file, type.getCode(), getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
+	private <T extends Market> boolean importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) {
+		List<List<String>> sheet;
+		try {
+			sheet = parseExcelFile(file, type.getCode(), getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 		List<T> entities = parseMarketExcelSheet(sheet, type);
 
 		repository.deleteAll();
 		repository.save(entities);
+		
+		return true;
 	}
 
 

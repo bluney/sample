@@ -62,19 +62,20 @@ public abstract class AbstractExcelController implements ExcelController, Handle
 	@Override
 	public String importExcel(UploadFile fileObject, Model model, HttpServletRequest request, BindingResult result) throws IOException {
 		logger.warn("request method: importExcel()");	
-		Map<String,Object> m = new HashMap<String,Object>();
-				
+		
 		if (!result.hasErrors()) {
-			Boolean isSuccess = getExcelService().importExcel(fileObject.getFile(), result);
-			m.put(MODEL_MESSAGE_RESPONSE_SUCCESS, isSuccess);
+			boolean isSuccess = getExcelService().importExcel(fileObject.getFile(), result);
+			model.addAttribute(MODEL_MESSAGE_RESPONSE_SUCCESS, isSuccess);
 		} else {
-			m.put(MODEL_MESSAGE_RESPONSE_SUCCESS, false);
+			model.addAttribute(MODEL_MESSAGE_RESPONSE_SUCCESS, false);
 		}
 		
 		logger.debug(request.getRequestURL().toString());
-		model.addAttribute(MODEL_MESSAGE, m);
 		
-		return request.getRequestURL().toString();
+		String msg = "IMPORT SUCCESS!";
+		model.addAttribute(MODEL_MESSAGE_RESPONSE, msg);
+		
+		return "/service/common/uploadExcel.html";
 	}
 	
 	@Override

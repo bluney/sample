@@ -138,7 +138,7 @@ button {
 <body onLoad="winCentre()">
 	<div class="container">
 		<div class="row-fluid">
-			<form th:unless="${model_message}" th:action="${upload_base_url}+'/importExcel'" enctype="multipart/form-data" th:object="${upload_file_entity}" id="queryForm" method="post">
+			<form th:unless="${model_message_response}" th:action="${upload_base_url}+'/importExcel'" enctype="multipart/form-data" th:object="${upload_file_entity}" id="queryForm" method="post">
 				<table class="table">
 					<thead>
 						<tr>
@@ -167,9 +167,12 @@ button {
 					</tbody>
 				</table>
 			</form>
-			<div th:if="${model_message}" >
-				<button th:if="${model_message.model_message_response_success}==true" type="button" onclick="complete();" class="btn btn-success pull-center" value="IMPORT 성공" />
-				<button th:unless="${model_message.model_message_response_success}==true" type="button" onclick="complete();" class="btn btn-danger pull-center" value="IMPORT 실패" />
+			<div th:if="${model_message_response}" class="span12">
+				<H3 th:text="${model_message_response}"></H3>
+				<div class="well" style="max-width: 400px; margin: 0 auto 10px;">
+              		<button th:if="${model_message_response_success}" type="button" onclick="complete();" class="btn btn-block btn-primary">IMPORT 성공</button>
+					<button th:unless="${model_message_response_success}" type="button" onclick="complete();" class="btn btn-block">IMPORT 실패</button>
+				</div>
 			</div>
 		</div>
 		<!--/row-->
