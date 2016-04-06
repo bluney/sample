@@ -74,14 +74,6 @@ public class MarketExcelService extends AbstractExcelService {
 		return isSuccess;
 	}
 	
-	private <T extends Market> boolean importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) {
-		List<List<String>> sheet;
-		boolean isSuccess = true;
-		isSuccess &= importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
-		isSuccess &= importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
-		
-		return isSuccess;
-	}
 	
 	private <T extends Market> boolean importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) {
 		List<List<String>> sheet;
