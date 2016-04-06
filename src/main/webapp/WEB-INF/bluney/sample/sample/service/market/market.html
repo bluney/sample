@@ -576,7 +576,14 @@ function importExcel(){
 }
 
 function analyzeMarketTimeSeries(){
-	
+	$.ajax({
+		type : "GET",
+		url : "/service/market/analyzeMarketTimeSeries",
+		//data : {"code" : updateLevel},
+		success : function (response) {
+			//$("#level" + updateLevel + "Selector").html(response);
+		}
+	});		
 }
 
 // Run Datables plugin and create 3 variants of settings

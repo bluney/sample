@@ -1,6 +1,10 @@
 package bluney.sample.sample.customtype.market;
 
-abstract public class Market {
+import org.springframework.data.annotation.Transient;
+
+import lombok.AllArgsConstructor;
+
+abstract public @AllArgsConstructor class Market implements Comparable<Market>{
 
 	abstract public String getCode();
 	abstract public void setCode(String code);
@@ -14,4 +18,19 @@ abstract public class Market {
 	abstract public Double getValue();
 	abstract public void setValue(Double value);
 
+	@Override
+	@Transient
+	public int compareTo(Market o) {
+		if (getDate() == null || o.getDate() == null)
+			return 0;
+		return getDate().compareTo(o.getDate());
+	}
+	
+	@Transient
+	public void setMarket(Market o) {
+		this.setCode(o.getCode());
+		this.setClassification(o.getClassification());
+		this.setDate(o.getDate());
+		this.setValue(o.getValue());
+	}
 }

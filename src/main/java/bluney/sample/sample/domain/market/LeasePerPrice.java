@@ -1,4 +1,4 @@
-package bluney.sample.sample.domain.lease.price;
+package bluney.sample.sample.domain.market;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,15 +20,16 @@ import lombok.ToString;
 
 @Springfield(strategy=Strategy.HIBERNATE)
 @Entity
-@Table(name="lease_price")
-public @ToString @NoArgsConstructor @AllArgsConstructor class LeasePriceEntity extends Market {
+@Table(name="lease_per_price")
+public @ToString @NoArgsConstructor @AllArgsConstructor class LeasePerPrice extends Market {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_LEASE_PRICE_PK_SYNC")
-	@SequenceGenerator(name="SEQ_LEASE_PRICE_PK_SYNC", sequenceName="SEQ_LEASE_PRICE_PK_SYNC")
+	@GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_LEASE_PER_PRICE_PK_SYNC")
+	@SequenceGenerator(name="SEQ_LEASE_PER_PRICE_PK_SYNC", sequenceName="SEQ_LEASE_PER_PRICE_PK_SYNC")
 	private @Getter @Setter Integer id;				//순번 시퀀스
 	
 	private @Getter @Setter String code;			//법정동 코드 
 	private @Getter @Setter @NotNull String classification;	//행정구역 식별자
 	private @Getter @Setter @NotNull java.util.Date date;	//날짜
-	private @Getter @Setter Double value;			//전세 가격			
+	private @Getter @Setter Double value;			//전세율
+	
 }

@@ -27,8 +27,8 @@ public @ToString @NoArgsConstructor @AllArgsConstructor class LeaseRateEntity ex
 	@SequenceGenerator(name="SEQ_LEASE_RATE_PK_SYNC", sequenceName="SEQ_LEASE_RATE_PK_SYNC")
 	private @Getter @Setter Integer id;				//순번 시퀀스
 	
-	private @Getter @Setter String code;			// 법정동 코드 
-	private @Getter @Setter @NotNull String classification;	// 행정구역 식별자
-	private @Getter @Setter @NotNull java.util.Date date;	//
-	private @Getter @Setter Double value;			// 전세 증감률
+	private @Getter @Setter String code;			//법정동 코드 
+	private @Getter @Setter @NotNull String classification;	//행정구역 식별자
+	private @Getter @Setter @NotNull java.util.Date date;	//날짜
+	private @Getter @Setter Double value;			//전세 증감률
 }

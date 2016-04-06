@@ -27,8 +27,8 @@ public @ToString @NoArgsConstructor @AllArgsConstructor class SellingPriceEntity
 	@SequenceGenerator(name="SEQ_SELLING_PRICE_PK_SYNC", sequenceName="SEQ_SELLING_PRICE_PK_SYNC")
 	private @Getter @Setter Integer id;				//순번 시퀀스
 	
-	private @Getter @Setter String code;			// 법정동 코드 
-	private @Getter @Setter @NotNull String classification;	// 행정구역 식별자
-	private @Getter @Setter @NotNull java.util.Date date;	//
-	private @Getter @Setter Double value;			// 매매 가격			
+	private @Getter @Setter String code;			//법정동 코드 
+	private @Getter @Setter @NotNull String classification;	//행정구역 식별자
+	private @Getter @Setter @NotNull java.util.Date date;	//날짜
+	private @Getter @Setter Double value;			//매매 가격			
 }

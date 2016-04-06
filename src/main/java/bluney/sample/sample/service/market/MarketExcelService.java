@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.View;
 
@@ -29,6 +27,7 @@ import bluney.sample.sample.common.util.DataConvertUtil;
 import bluney.sample.sample.common.util.NullJudgeUtil;
 import bluney.sample.sample.customtype.market.Market;
 import bluney.sample.sample.customtype.market.MarketType;
+import bluney.sample.sample.domain.classification.ClassificationEntity;
 import bluney.sample.sample.domain.lease.price.LeasePriceEntity;
 import bluney.sample.sample.domain.lease.rate.LeaseRateEntity;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
@@ -44,6 +43,9 @@ public class MarketExcelService extends AbstractExcelService {
 	private final static int LAST_COLUMN_IN_EXCEL_FILE = 5;//188;		// 엑셀의 column 마지막 위치
 
 	private final static String DELIM_CLASSFICATION = "_";
+	
+	@Autowired @Qualifier("leasePriceEntityRepository")
+	private EntityRepository<ClassificationEntity, Integer> classificationRepository;
 	
 	@Autowired @Qualifier("leasePriceEntityRepository")
 	private EntityRepository<LeasePriceEntity, Integer> leasePriceRepository;
@@ -63,12 +65,17 @@ public class MarketExcelService extends AbstractExcelService {
 		setStartRow(START_ROW_IN_EXCEL_FILE);
 		setStartColumn(START_COLUMN_IN_EXCEL_FILE);
 		
-//		List<List<String>> sheet = parseExcelFile(file, SHEET_IDX_OF_SELLING_PRICE, getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE, LAST_COLUMN_IN_EXCEL_FILE);
-//		List<SellingPriceEntity> entities = parseExcelSheet(sheet);
-//
-//		sellingPriceRepository.deleteAll();
-//		sellingPriceRepository.save(entities);
-
+		boolean isSuccess = true;
+		isSuccess &= importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
+		isSuccess &= importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);
+		isSuccess &= importMarketExcel(file, MarketType.LEASE_PRICE, leasePriceRepository);
+		isSuccess &= importMarketExcel(file, MarketType.LEASE_RATE, leaseRateRepository);
+		
+		return isSuccess;
+	}
+	
+	private <T extends Market> boolean importMarketExcel(CommonsMultipartFile file, MarketType type, EntityRepository<T, Integer> repository) {
+		List<List<String>> sheet;
 		boolean isSuccess = true;
 		isSuccess &= importMarketExcel(file, MarketType.SELLING_PRICE, sellingPriceRepository);
 		isSuccess &= importMarketExcel(file, MarketType.SELLING_RATE, sellingRateRepository);

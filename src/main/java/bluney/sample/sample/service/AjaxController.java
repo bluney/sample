@@ -17,7 +17,7 @@ import bluney.sample.sample.HomeController;
 @Controller
 public class AjaxController {
 
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AjaxController.class);
 	
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -34,12 +34,7 @@ public class AjaxController {
 	
 		return "/service/bigdata/map_daum_sample";
 	}
-	
-	@RequestMapping(value = "/service/market/market.html", method = RequestMethod.GET)
-	public String sampleMarket(Locale locale, Model model) {
-	
-		return "/service/market/market.html";
-	}
+
 	
 
 }
