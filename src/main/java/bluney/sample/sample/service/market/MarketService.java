@@ -353,15 +353,33 @@ public class MarketService {
 				
 				Collections.sort(resultList, Collections.reverseOrder());
 				
-				//TODO 비어 있는 데이터 찾아서 넣어볼까?
-				for(int i=0; i<resultList.size()-1; i++) {
+				int size = resultList.size();
+				for(int i=0; i<size-1; i++) {
 					V curItem = resultList.get(i);
 					V prevItem = resultList.get(i+1);
 					
-					if(curItem.getDate().getTime() - prevItem.getDate().getTime() != MILESECONDS_OF_ONE_WEEK) {
-						logger.warn("Invalid value : date inteval is not 1 weeks. 지역=" + curItem.getClassification() + ", 날짜=" + curItem.getDate() + ", interval=" 
-									+ (curItem.getDate().getTime() - prevItem.getDate().getTime())/1000/60/60/24 + "day(s)");
-						 
+					Long interval = curItem.getDate().getTime() - prevItem.getDate().getTime(); 
+					if(interval == MILESECONDS_OF_ONE_WEEK) {
+						continue;
+					}
+
+					logger.warn("Invalid value : date inteval is not 1 weeks. 지역=" + curItem.getClassification() + ", 날짜=" 
+								+ curItem.getDate() + ", interval=" + interval/1000/60/60/24 + "day(s)");
+					
+					if(interval % MILESECONDS_OF_ONE_WEEK == 0) {
+						double increaseValue = (curItem.getValue() - prevItem.getValue()) / (double)(interval / MILESECONDS_OF_ONE_WEEK); 
+						while (interval > 0) {
+							interval -= MILESECONDS_OF_ONE_WEEK;
+							V newItem = newInstance();
+							newItem.setMarket(prevItem);
+							newItem.setDate(new Date(prevItem.getDate().getTime() + interval));
+							newItem.setValue(prevItem.getValue() + increaseValue * (double)(interval / MILESECONDS_OF_ONE_WEEK));
+							
+							resultList.add(newItem);
+						}
+					}
+					else {
+						logger.error("Invalid value : cannot handling data. 지역=" + curItem.getClassification() + ", 날짜=" + curItem.getDate());
 					}
 				}
 				resultLists.addAll(resultList);
