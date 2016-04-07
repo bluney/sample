@@ -19,10 +19,45 @@ function analyzeMarketTimeSeries(){
 	});		
 }
 
+function calcurateRateOfEarning(){
+	var hasParam = false;
+	var param = "?";
+	if($('#chk-rate').is(":checked")) {
+		param += "rate=";
+		param += $('#input-spinner-rate').spinner("value");
+		hasParam = true;
+	}
+	if($('#chk-selling').is(":checked")) {
+		if(hasParam) {
+			param += "&";
+		}
+		param += "selling=";
+		param += $('#input-spinner-selling').spinner("value");
+	}
+	if($('#chk-lease').is(":checked")) {
+		if(hasParam) {
+			param += "&";
+		}
+		param += "lease=";
+		param += $('#input-spinner-lease').spinner("value");
+	}
+	alert(param);
+	$.ajax({
+		type : "GET",
+		url : "/service/market/calcurateRateOfEarning"+param,
+		//data : {"code" : updateLevel},
+		success : function (response) {
+			//$("#level" + updateLevel + "Selector").html(response);
+		}
+	});		
+}
+
 function ApplyTable(table){
 	table.dataTable( {
 		"aaSorting": [[ 0, "asc" ]],
-		"sDom": "<'box-content'<'col-sm-6'f><'col-sm-6 text-right'l><'clearfix'>>rt<'box-content'p<'clearfix'>>",
+		//"sDom": "<'row view-filter'<'col-sm-12'<'pull-left'l><'pull-right'f><'clearfix'>>>t<'row view-pager'<'col-sm-12'<'text-center'ip>>>",
+		//"sDom": "<'col-sm-8 text-right'i<'clearfix'>><'col-sm-4 text-left'f<'clearfix'>>rt<'col-sm-12 text-left'p><'clearfix'>",
+		"sDom": "<'row view-filter'<'col-sm-12'<'pull-left'i><'pull-right'f><'clearfix'>>>rt<'row view-pager'<'col-sm-12'<'text-left'p>>>",
 		//"sDom": "<'box-content'<'col-sm-6'f><'col-sm-6 text-right'l><'clearfix'>>rt<'box-content'<'col-sm-6'i><'col-sm-6 text-right'p><'clearfix'>>",
 		//"sDom": '<"top"i>rt<"bottom"p><"clear">',
 		"sPaginationType": "bootstrap",
@@ -34,7 +69,11 @@ function ApplyTable(table){
 }
 // Run Datables plugin and create 3 variants of settings
 function AllTables(){
-	ApplyTable($('table.display'))
+	ApplyTable($('#tableSelling'))
+	ApplyTable($('#tableLease'))
+	ApplyTable($('#tableRate'))
+	ApplyTable($('#tableGinSelling'))
+	ApplyTable($('#tableGinLease'))
 	LoadSelect2Script(MakeSelect2);
 }
 function MakeSelect2(){
@@ -49,4 +88,46 @@ $(document).ready(function() {
 	
 	// Add Drag-n-Drop feature
 	WinMove();
+	
+
+	$('.calcurate-rate-of-earning').change(function() {
+		var selector;
+		var id = $(this).attr("id");
+		if(id == "chk-rate") {
+			selector = $('#input-spinner-rate');
+		} else if(id == "chk-selling") {
+			selector = $('#input-spinner-selling');
+		} else if(id == "chk-lease") {
+			selector = $('#input-spinner-lease');
+		}
+	
+		if($(this).is(":checked")) {
+			//alert("checked id=" + $(this).attr("id"));
+			selector.spinner("option", "disabled", false);
+			return;
+		}
+		//alert("unchecked id=" + $(this).attr("id"));
+		selector.spinner("option", "disabled", true);
+		// 'unchecked' event code
+	});
+	
+	$("#input-spinner-rate").spinner({
+		min:50,
+		max:100,
+		step:1
+	}).val(75).width(50);
+
+	$("#input-spinner-selling").spinner({
+		min:0.0,
+		max:10.0,
+		step:0.1,
+		disabled:true
+	}).val(5.0).width(50);
+	
+	$("#input-spinner-lease").spinner({
+		min:0.0,
+		max:10.0,
+		step:0.1,
+		disabled:true
+	}).val(5.0).width(50);
 });
