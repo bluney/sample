@@ -10,12 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
-@QueryMethod("findByClassificationAndDateOrderByClassificationAscDateDesc")
-public @ToString @NoArgsConstructor @AllArgsConstructor class MarketQuery {
-
-	private @Getter @Setter @NotNull String classification;	//행정구역 식별자
+@QueryMethod("findByDateOrderByValueDesc")
+public @ToString @NoArgsConstructor @AllArgsConstructor class MarketRankQuery {
 	private @Getter @Setter @NotNull java.util.Date date;	//날짜	
 }
-
-

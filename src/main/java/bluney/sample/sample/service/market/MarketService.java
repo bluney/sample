@@ -19,10 +19,13 @@ import org.springframework.stereotype.Service;
 import com.u2ware.springfield.repository.EntityRepository;
 
 import bluney.sample.sample.customtype.market.Market;
+import bluney.sample.sample.customtype.market.MarketGin;
 import bluney.sample.sample.domain.lease.PyeongLeasePrice;
 import bluney.sample.sample.domain.lease.price.LeasePriceEntity;
 import bluney.sample.sample.domain.lease.rate.LeaseRateEntity;
 import bluney.sample.sample.domain.market.LeasePerPrice;
+import bluney.sample.sample.domain.market.gin.lease.MarketGinSelling;
+import bluney.sample.sample.domain.market.gin.selling.MarketGinLease;
 import bluney.sample.sample.domain.selling.PyeongSellingPrice;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.domain.selling.rate.SellingRateEntity;
@@ -31,8 +34,11 @@ import bluney.sample.sample.domain.selling.rate.SellingRateEntity;
 public class MarketService {
 
 	private static final Logger logger = LoggerFactory.getLogger(MarketService.class);	
+	private static final int INTERVAL_FOR_GIN_VALUE = 26;
+
 	public static final double M2_TO_PYEONG = 3.305785;
 	public static final long MILESECONDS_OF_ONE_WEEK = 604800000;	// 7*24*60*60*1000
+	
 	
 	
 	@Autowired @Qualifier("sellingPriceEntityRepository")
@@ -55,7 +61,14 @@ public class MarketService {
 
 	@Autowired @Qualifier("leasePerPriceRepository")
 	private EntityRepository<LeasePerPrice, Integer> leasePerPriceRepository;
+
+	@Autowired @Qualifier("marketGinSellingRepository")
+	private EntityRepository<MarketGinSelling, Integer> marketGinSellingRepository;
+
+	@Autowired @Qualifier("marketGinLeaseRepository")
+	private EntityRepository<MarketGinLease, Integer> marketGinLeaseRepository;
 		
+
 	public void analyzeMarketTimeSeries() {
 
 		//평당 매매 가격 분석
@@ -81,113 +94,29 @@ public class MarketService {
 		leasePerPriceRepository.deleteAll();
 		leasePerPriceRepository.save(leasePerPriceList);
 		
+//		List<PyeongSellingPrice> sellingList = pyeongSellingRepository.findAll();
+//		List<PyeongLeasePrice> leaseList = pyeongLeaseRepository.findAll();
+		
+		//지인1
+		AnalyzeGin<PyeongSellingPrice, MarketGinSelling> analyzeGinSelling = 
+				new AnalyzeGin<PyeongSellingPrice, MarketGinSelling>(sellingList, MarketGinSelling.class);
+		
+		List<MarketGinSelling> ginSellingList = analyzeGinSelling.analyze();
+		marketGinSellingRepository.deleteAll();
+		marketGinSellingRepository.save(ginSellingList);
 		
 		
+		//지인2
+		AnalyzeGin<PyeongLeasePrice, MarketGinLease> analyzeGinLease = 
+				new AnalyzeGin<PyeongLeasePrice, MarketGinLease>(leaseList, MarketGinLease.class);
 		
-//		List<SellingPriceEntity> priceEntities = sellingPriceRepository.findAll();
-//		List<SellingRateEntity> rateEntities = sellingRateRepository.findAll();
-//		
-//		Map<String, List<SellingPriceEntity>> priceMap = groupByClassificationMap(priceEntities);
-//		Map<String, List<SellingRateEntity>> rateMap = groupByClassificationMap(rateEntities);
-//		
-//		Map<String, List<PyeongSellingPrice>> pyeongSellingPriceMap = new HashMap<String, List<PyeongSellingPrice>>();
-//		
-//		for(Entry<String, List<SellingRateEntity>> cls : rateMap.entrySet()) {
-//		
-//			List<PyeongSellingPrice> resultList = new ArrayList<PyeongSellingPrice>();
-//			List<SellingRateEntity> rateList = cls.getValue();
-//			List<SellingPriceEntity> priceList = priceMap.get(cls.getKey());
-//			Collections.sort(rateList, Collections.reverseOrder());
-//			Collections.sort(priceList, Collections.reverseOrder());
-//			
-//			for(SellingPriceEntity e : priceList) {
-//				PyeongSellingPrice result = new PyeongSellingPrice();
-//				result.setClassification(e.getClassification());
-//				result.setCode(e.getCode());
-//				result.setValue(e.getValue()*M2_TO_PYEONG);
-//
-//				Date date = null;
-//				for(SellingRateEntity rateEntity : rateList) {
-//					if(e.getDate().after(rateEntity.getDate())) {
-//						Calendar calPrice = Calendar.getInstance();
-//						Calendar calRate = Calendar.getInstance();
-//						calPrice.setTime(e.getDate());
-//						calRate.setTime(rateEntity.getDate());
-//						
-//						date = rateEntity.getDate();
-//						break;
-//					}
-//				}
-//				result.setDate(date);
-//				
-//				resultList.add(result);
-//			}
-//			
-//			Collections.sort(resultList, Collections.reverseOrder());
-//			
-//			
-//			int rateIndex=0, resultIndex=0;
-//			int rateSize = rateList.size();
-//			int resultSize = resultList.size();
-//			Stack<SellingRateEntity> stack = new Stack<SellingRateEntity>();
-//			while(true) {
-//				if(rateIndex >= rateSize) {
-//					break;
-//				}
-//				if(resultIndex >= resultSize) {
-//					Double curPrice = resultList.get(resultIndex-1).getValue();
-//					
-//					for(int i=rateIndex; i<rateSize; i++) {
-//						SellingRateEntity rateItem = rateList.get(i);
-//						PyeongSellingPrice newItem = new PyeongSellingPrice();
-//						newItem.setClassification(rateItem.getClassification());
-//						newItem.setCode(rateItem.getCode());
-//						newItem.setDate(rateItem.getDate());
-//						curPrice = curPrice / (rateItem.getValue() / 100.0 + 1);
-//						newItem.setValue(curPrice);
-//						
-//						resultList.add(newItem);
-//					}
-//					
-//					break;
-//				}
-//				
-//				SellingRateEntity rateEntity = rateList.get(rateIndex);
-//				PyeongSellingPrice resultEntity = resultList.get(resultIndex);
-//				
-//				if(rateEntity.getDate() == resultEntity.getDate()) {
-//					Double curPrice = resultEntity.getValue();
-//
-//					while(stack.size() > 0) {
-//						SellingRateEntity rateItem = stack.pop();
-//						
-//						curPrice = curPrice + (curPrice * rateItem.getValue() / 100.0);
-//						PyeongSellingPrice newItem = new PyeongSellingPrice();
-//						newItem.setClassification(rateItem.getClassification());
-//						newItem.setCode(rateItem.getCode());
-//						newItem.setDate(rateItem.getDate());
-//						newItem.setValue(curPrice);
-//						
-//						resultList.add(newItem);
-//					}
-//					
-//					resultIndex++;
-//					rateIndex++;
-//					
-//				} else if(rateEntity.getDate().after(resultEntity.getDate())) {
-//					stack.push(rateEntity);
-//					rateIndex++;
-//					
-//				} 
-//			
-//			}
-//			
-//			Collections.sort(resultList, Collections.reverseOrder());
-//			pyeongSellingPriceMap.put(cls.getKey(), resultList);
-//		}
-
+		List<MarketGinLease> ginLeaseList = analyzeGinLease.analyze();
+		marketGinLeaseRepository.deleteAll();
+		marketGinLeaseRepository.save(ginLeaseList);		
+		
 	}
 
+	
 	private List<LeasePerPrice> analyzeLeasePerPrice(List<PyeongSellingPrice> _sellingList, List<PyeongLeasePrice> _leaseList) {
 		List<LeasePerPrice> resultLists = new ArrayList<LeasePerPrice>();
 		
@@ -195,12 +124,14 @@ public class MarketService {
 		Map<String, List<PyeongLeasePrice>> leaseMap = groupByClassificationMap(_leaseList);
 		
 		for(Entry<String, List<PyeongSellingPrice>> cls : sellingMap.entrySet()) {
-			List<LeasePerPrice> resultList = (List<LeasePerPrice>) new ArrayList<LeasePerPrice>();
 			List<PyeongSellingPrice> sellingList = cls.getValue();
 			List<PyeongLeasePrice> leaseList = leaseMap.get(cls.getKey());
 			
 			Collections.sort(sellingList, Collections.reverseOrder());
 			Collections.sort(leaseList, Collections.reverseOrder());
+			
+			
+			List<LeasePerPrice> resultList = (List<LeasePerPrice>) new ArrayList<LeasePerPrice>();
 			
 			int sellingSize = sellingList.size();
 			int leaseSize = leaseList.size();
@@ -211,7 +142,8 @@ public class MarketService {
 				if(selling.getDate().equals(lease.getDate())) {
 					LeasePerPrice result = new LeasePerPrice();
 					result.setMarket(selling);
-					result.setValue(lease.getValue()/selling.getValue());
+					Double value = (lease.getValue()!=null && selling.getValue()!=null) ? (lease.getValue()/selling.getValue()) : null;
+					result.setValue(value);
 					
 					resultList.add(result);
 
@@ -230,6 +162,23 @@ public class MarketService {
 		}
 		
 		return resultLists;
+	}
+	
+	
+	private <Q extends Market> Map<String, List<Q>> groupByClassificationMap(List<Q> list) {
+		Map<String, List<Q>> map = new HashMap<String, List<Q>>();
+		for(Q e : list) {
+			List<Q> subList;
+			String key = e.getClassification();
+			if(map.containsKey(key)) {
+				subList = (List<Q>) map.get(key);
+			} else {
+				subList = new ArrayList<Q>();
+				map.put(key, subList);
+			}
+			subList.add(e);
+		}
+		return map;
 	}
 	
 	class AnalyzeMarket<T extends Market, U extends Market, V extends Market> {
@@ -267,11 +216,20 @@ public class MarketService {
 				List<V> resultList = (List<V>) new ArrayList<V>();
 				List<U> rateList = cls.getValue();
 				List<T> priceList = priceMap.get(cls.getKey());
+				if(priceList == null) {
+					logger.error("priceList empty. please check the rootine of importing excel file. 지역=" + cls.getKey());
+					continue;
+				}
+				
 				Collections.sort(rateList, Collections.reverseOrder());
 				Collections.sort(priceList, Collections.reverseOrder());
 
 				// m2당 가격을 평당 가격으로 변환 
 				for(T e : priceList) {
+					if(e.getValue()==null) {
+						continue;
+					}
+					
 					V result = (V) newInstance();
 					result.setMarket(e);
 					result.setValue(e.getValue()*M2_TO_PYEONG);
@@ -297,6 +255,10 @@ public class MarketService {
 				
 				Collections.sort(resultList, Collections.reverseOrder());
 				
+				if(resultList.size() <= 0) {
+					logger.error("resultList empty. please check the rootine of importing excel file. 지역=" + cls.getKey());
+					continue;
+				}
 				
 				// 위에서 변환한 평당가격과 증강을 이용하여 매주 평당가격 계산 
 				int rateIndex = 0;
@@ -310,12 +272,16 @@ public class MarketService {
 					}
 					if(resultIndex >= resultSize) {
 						Double curPrice = resultList.get(resultIndex-1).getValue();
+						if(curPrice == null) {
+							stack.clear();
+							break;
+						}
 						
 						for(int i=rateIndex; i<rateSize; i++) {
 							U rateItem = rateList.get(i);
 							V newItem = newInstance();
 							newItem.setMarket(rateItem);
-							curPrice = curPrice / (rateItem.getValue() / 100.0 + 1);
+							curPrice = (curPrice!=null && rateItem.getValue()!=null) ? (curPrice / (rateItem.getValue()/100.0+1)) : null;
 							newItem.setValue(curPrice);
 							
 							resultList.add(newItem);
@@ -328,14 +294,18 @@ public class MarketService {
 					V resultEntity = resultList.get(resultIndex);
 					
 					if(rateEntity.getDate() == resultEntity.getDate()) {
-						Double curPrice = resultEntity.getValue();
-
 						while(stack.size() > 0) {
+							Double curPrice = resultEntity.getValue();
+							if(curPrice == null) {
+								stack.clear();
+								break;
+							}
+							
 							U rateItem = stack.pop();
 							
 							V newItem = newInstance();
 							newItem.setMarket(rateItem);
-							curPrice = curPrice + (curPrice * rateItem.getValue() / 100.0);
+							curPrice = (curPrice!=null && rateItem.getValue()!=null) ? (curPrice + (curPrice*rateItem.getValue()/100.0)) : null;
 							newItem.setValue(curPrice);
 							
 							resultList.add(newItem);
@@ -358,6 +328,10 @@ public class MarketService {
 					V curItem = resultList.get(i);
 					V prevItem = resultList.get(i+1);
 					
+					if(curItem.getValue()==null || prevItem.getValue()==null) {
+						break;
+					}
+					
 					Long interval = curItem.getDate().getTime() - prevItem.getDate().getTime(); 
 					if(interval == MILESECONDS_OF_ONE_WEEK) {
 						continue;
@@ -373,7 +347,8 @@ public class MarketService {
 							V newItem = newInstance();
 							newItem.setMarket(prevItem);
 							newItem.setDate(new Date(prevItem.getDate().getTime() + interval));
-							newItem.setValue(prevItem.getValue() + increaseValue * (double)(interval / MILESECONDS_OF_ONE_WEEK));
+							Double value = prevItem.getValue()+increaseValue*(double)(interval/MILESECONDS_OF_ONE_WEEK);
+							newItem.setValue(value);
 							
 							resultList.add(newItem);
 						}
@@ -390,19 +365,68 @@ public class MarketService {
 		
 	}
 	
-	private <Q extends Market> Map<String, List<Q>> groupByClassificationMap(List<Q> list) {
-		Map<String, List<Q>> map = new HashMap<String, List<Q>>();
-		for(Q e : list) {
-			List<Q> subList;
-			String key = e.getClassification();
-			if(map.containsKey(key)) {
-				subList = (List<Q>) map.get(key);
-			} else {
-				subList = new ArrayList<Q>();
-				map.put(key, subList);
-			}
-			subList.add(e);
+	class AnalyzeGin<T extends Market, U extends MarketGin> {
+		private List<T> entities;
+		private Class<U> clazz;
+		
+		public AnalyzeGin(List<T> entities, Class<U> clazz) {
+			this.entities = entities;
+			this.clazz = clazz;
 		}
-		return map;
+		
+		private U newInstance()  {
+			try {
+				return clazz.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
+		public List<U> analyze() {
+			List<U> resultLists = new ArrayList<U>();
+			
+			Map<String, List<T>> map = groupByClassificationMap(entities);
+			
+			for(Entry<String, List<T>> cls : map.entrySet()) {
+				List<T> list = cls.getValue();
+				Collections.sort(list, Collections.reverseOrder());
+				
+				
+				List<U> resultList = new ArrayList<U>();
+				
+				int size = list.size();
+				if(size - INTERVAL_FOR_GIN_VALUE <= 0) {
+					logger.warn("invalid input value. 지역=" + list.get(0).getClassification() + ", size=" + size);
+				}
+				
+				for(int i=0; i<size-INTERVAL_FOR_GIN_VALUE ; i++) {
+					T to = list.get(i);
+					T from = list.get(i+INTERVAL_FOR_GIN_VALUE);
+					
+					if(to.getValue()==null || from.getValue()==null) {
+						continue;
+					}
+					
+					U newItem = newInstance();
+					newItem.setClassification(to.getClassification());
+					newItem.setCode(to.getCode());
+					newItem.setDate(to.getDate());
+					newItem.setFromDate(from.getDate());
+					
+					Double value = (to.getValue()-from.getValue()) / from.getValue()*100.0;
+					newItem.setValue(value);
+					
+					resultList.add(newItem);
+				}
+				
+				resultLists.addAll(resultList);
+			}
+			
+			return resultLists;
+		}
+		
 	}
+	
 }
