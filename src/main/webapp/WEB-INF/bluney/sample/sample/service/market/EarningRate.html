@@ -1,0 +1,30 @@
+<label th:text="'수익율 = ' + ${earning_rate_average} + '%'"></label>
+<table th:if="${earning_rate_entity}" class="table display table-striped table-hover table-heading table-datatable" id="tableEarningRate">
+	<thead>
+		<tr>
+			<th colspan='7'>수익률 계산</th>
+		</tr>
+		<tr>
+			<th style="text-align: center;">랭킹</th>
+			<th style="text-align: center;">지역명</th>
+			<th style="text-align: center;">DATE</th>
+			<th style="text-align: center;">수익율 (단위:%)</th>
+			<th style="text-align: center;">전세율 </th>
+			<th style="text-align: center;">매매증감 </th>
+			<th style="text-align: center;">전세증감 </th>
+		</tr>
+	</thead>
+	<tfoot style="height:0px;">
+	</tfoot>
+	<tbody>
+		<tr th:each="entity, idx : ${earning_rate_entity}" >
+			<td style="text-align: center;" th:text="${idx.count}">1</td>
+			<td style="text-align: center;" th:text="${entity.classification}">1</td>
+			<td style="text-align: center;" th:text="${#dates.format(entity.date, 'yyyy-MM-dd')}">1</td>
+			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value*100.0, 0, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginRate, 0, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginSelling, 0, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginLease, 0, 2, 'POINT')}">13.10</td>
+		</tr>
+	</tbody>
+</table>

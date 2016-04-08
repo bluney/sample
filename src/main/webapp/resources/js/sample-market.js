@@ -33,6 +33,7 @@ function calcurateRateOfEarning(){
 		}
 		param += "selling=";
 		param += $('#input-spinner-selling').spinner("value");
+		hasParam = true;
 	}
 	if($('#chk-lease').is(":checked")) {
 		if(hasParam) {
@@ -40,14 +41,22 @@ function calcurateRateOfEarning(){
 		}
 		param += "lease=";
 		param += $('#input-spinner-lease').spinner("value");
+		hasParam = true;
 	}
-	alert(param);
+	
+	if(!hasParam) {
+		alert("WARNING : 최소 하나 이상의 옵션을 선택해야 합니다.");
+		return;
+	}
+	
 	$.ajax({
 		type : "GET",
-		url : "/service/market/calcurateRateOfEarning"+param,
-		//data : {"code" : updateLevel},
+		url : "/service/market/calcurateRateOfEarning",//+param,
+		data : {"rate" : $('#input-spinner-rate').spinner("value"),
+				"selling" : $('#input-spinner-selling').spinner("value"),
+				"lease" : $('#input-spinner-lease').spinner("value")},
 		success : function (response) {
-			//$("#level" + updateLevel + "Selector").html(response);
+			$("#divEarningRate").html(response);
 		}
 	});		
 }
@@ -63,17 +72,26 @@ function ApplyTable(table){
 		"sPaginationType": "bootstrap",
 		"oLanguage": {
 			"sSearch": "",
-			"sLengthMenu": '_MENU_'
+			"sLengthMenu": '_MENU_',
+			"oPaginate": {
+				"sNext": "",
+				"sPrevious": ""
+			},
+			"sInfo": " _START_~_END_ of _TOTAL_ entries",
+			"sInfoEmpty": "0 entries",
+			"sInfoFiltered": "(_MAX_ total entries)",
 		}
 	});
 }
+
 // Run Datables plugin and create 3 variants of settings
 function AllTables(){
-	ApplyTable($('#tableSelling'))
-	ApplyTable($('#tableLease'))
-	ApplyTable($('#tableRate'))
-	ApplyTable($('#tableGinSelling'))
-	ApplyTable($('#tableGinLease'))
+	ApplyTable($('#tableSelling'));
+	ApplyTable($('#tableLease'));
+	ApplyTable($('#tableRate'));
+	ApplyTable($('#tableGinSelling'));
+	ApplyTable($('#tableGinLease'));
+	ApplyTable($('#tableEarningRate'));
 	LoadSelect2Script(MakeSelect2);
 }
 function MakeSelect2(){

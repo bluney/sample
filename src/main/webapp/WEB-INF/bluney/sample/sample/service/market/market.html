@@ -26,48 +26,6 @@
 				<button type="button" class="btn btn-default" onclick="importExcel()">Import 시계열 Data</button>
 				<button type="button" class="btn btn-default" onclick="analyzeMarketTimeSeries()">시계열 Data 분석</button>
 			</div>
-			<div class="box-header">
-				<div class="box-name">
-					<i class="fa fa-usd"></i>
-					<span>수익율 계산</span>
-				</div>
-				<div class="box-icons">
-					<a class="collapse-link">
-						<i class="fa fa-chevron-up"></i>
-					</a>
-				</div>
-				<div class="no-move"></div>
-			</div>
-			<div class="box-content">
-				<div class="row form-group">
-					<div class="col-sm-12">
-						<div class="col-sm-3 checkbox">
-							<label>
-								<input type="checkbox" id="chk-rate" class="calcurate-rate-of-earning" checked="true" />전세율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
-							</label>
-							<input type="text" id="input-spinner-rate" class="form-control" placeholder="전세율" />
-						</div>
-						<div class="col-sm-3 checkbox">
-							<label>
-								<input type="checkbox" id="chk-selling" class="calcurate-rate-of-earning" />매매증가율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
-							</label>
-							<input type="text" id="input-spinner-selling" class="col-sm-1 form-control" placeholder="매매증가율" />
-						</div>
-						<div class="col-sm-3 checkbox">
-							<label>
-								<input type="checkbox" id="chk-lease" class="calcurate-rate-of-earning" />전세증가율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
-							</label>
-							<input type="text" id="input-spinner-lease" class="form-control" placeholder="전세증가율" />
-						</div>
-						<div class="col-sm-3">
-							<button type="button" class="btn" onclick="calcurateRateOfEarning()">시계열 Data 분석</button>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>
@@ -170,7 +128,7 @@
 						<tr th:each="entity, idx : ${lease_per_selling_entity}" >
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
-							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value*100, 0, 2, 'POINT')}">13.10</td>
+							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 2, 'POINT')}">13.10</td>
 						</tr>
 					</tbody>
 				</table>
@@ -216,6 +174,57 @@
 						</tr>
 					</tbody>
 				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box">
+			<div class="box-header">
+				<div class="box-name">
+					<i class="fa fa-usd"></i>
+					<span>수익율 계산</span>
+				</div>
+				<div class="box-icons">
+					<a class="collapse-link">
+						<i class="fa fa-chevron-up"></i>
+					</a>
+				</div>
+				<div class="no-move"></div>
+			</div>
+			<div class="box-content">
+				<div class="row form-group">
+					<div class="col-sm-12">
+						<div class="col-sm-3 checkbox">
+							<label>
+								<input type="checkbox" id="chk-rate" class="calcurate-rate-of-earning" checked="true" />전세율&nbsp;&nbsp;&nbsp;
+								<i class="fa fa-square-o small"></i>
+							</label>
+							<input type="text" id="input-spinner-rate" class="form-control" placeholder="전세율" />
+						</div>
+						<div class="col-sm-3 checkbox">
+							<label>
+								<input type="checkbox" id="chk-selling" class="calcurate-rate-of-earning" />매매증가율&nbsp;&nbsp;&nbsp;
+								<i class="fa fa-square-o small"></i>
+							</label>
+							<input type="text" id="input-spinner-selling" class="col-sm-1 form-control" placeholder="매매증가율" />
+						</div>
+						<div class="col-sm-3 checkbox">
+							<label>
+								<input type="checkbox" id="chk-lease" class="calcurate-rate-of-earning" />전세증가율&nbsp;&nbsp;&nbsp;
+								<i class="fa fa-square-o small"></i>
+							</label>
+							<input type="text" id="input-spinner-lease" class="form-control" placeholder="전세증가율" />
+						</div>
+						<div class="col-sm-3">
+							<button type="button" class="btn" onclick="calcurateRateOfEarning()">수익율 계산</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 box-content table-responsive" id="divEarningRate">
+				
 			</div>
 		</div>
 	</div>

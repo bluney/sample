@@ -9224,7 +9224,7 @@
 				 *      } );
 				 *    } );
 				 */
-				"sNext": "",//"Next", [bluney]
+				"sNext": "Next", 
 			
 			
 				/**
@@ -9245,7 +9245,7 @@
 				 *      } );
 				 *    } );
 				 */
-				"sPrevious": ""//"Previous" [bluney]
+				"sPrevious": "Previous"
 			},
 		
 			/**

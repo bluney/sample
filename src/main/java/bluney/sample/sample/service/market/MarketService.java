@@ -5,9 +5,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 
 import org.slf4j.Logger;
@@ -23,9 +25,11 @@ import bluney.sample.sample.customtype.market.MarketGin;
 import bluney.sample.sample.domain.lease.PyeongLeasePrice;
 import bluney.sample.sample.domain.lease.price.LeasePriceEntity;
 import bluney.sample.sample.domain.lease.rate.LeaseRateEntity;
-import bluney.sample.sample.domain.market.LeasePerPrice;
+import bluney.sample.sample.domain.market.TotalMarket;
+import bluney.sample.sample.domain.market.earning.EarningRate;
 import bluney.sample.sample.domain.market.gin.lease.MarketGinSelling;
 import bluney.sample.sample.domain.market.gin.selling.MarketGinLease;
+import bluney.sample.sample.domain.market.rate.LeasePerPrice;
 import bluney.sample.sample.domain.selling.PyeongSellingPrice;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.domain.selling.rate.SellingRateEntity;
@@ -35,6 +39,7 @@ public class MarketService {
 
 	private static final Logger logger = LoggerFactory.getLogger(MarketService.class);	
 	private static final int INTERVAL_FOR_GIN_VALUE = 26;
+	private static final int INTERVAL_FOR_EARNING_RATE = 104;
 
 	public static final double M2_TO_PYEONG = 3.305785;
 	public static final long MILESECONDS_OF_ONE_WEEK = 604800000;	// 7*24*60*60*1000
@@ -68,6 +73,9 @@ public class MarketService {
 	@Autowired @Qualifier("marketGinLeaseRepository")
 	private EntityRepository<MarketGinLease, Integer> marketGinLeaseRepository;
 		
+	@Autowired @Qualifier("totalMarketRepository")
+	private EntityRepository<TotalMarket, Integer> totalMarketRepository;
+		
 
 	public void analyzeMarketTimeSeries() {
 
@@ -76,8 +84,8 @@ public class MarketService {
 				new AnalyzeMarket<SellingPriceEntity, SellingRateEntity, PyeongSellingPrice>(sellingPriceRepository, sellingRateRepository, PyeongSellingPrice.class);
 		
 		List<PyeongSellingPrice> sellingList = analyzeSelling.analyze();
-		pyeongSellingRepository.deleteAll();
-		pyeongSellingRepository.save(sellingList);
+//		pyeongSellingRepository.deleteAll();
+//		pyeongSellingRepository.save(sellingList);
 		
 
 		//평당 전세 가격 분석
@@ -85,25 +93,26 @@ public class MarketService {
 				new AnalyzeMarket<LeasePriceEntity, LeaseRateEntity, PyeongLeasePrice>(leasePriceRepository, leaseRateRepository, PyeongLeasePrice.class);
 		
 		List<PyeongLeasePrice> leaseList = analyzeLease.analyze();
-		pyeongLeaseRepository.deleteAll();
-		pyeongLeaseRepository.save(leaseList);
+//		pyeongLeaseRepository.deleteAll();
+//		pyeongLeaseRepository.save(leaseList);
 		
 		
 		//전세율(전세/매매) 분석
 		List<LeasePerPrice> leasePerPriceList = analyzeLeasePerPrice(sellingList, leaseList);
-		leasePerPriceRepository.deleteAll();
-		leasePerPriceRepository.save(leasePerPriceList);
+//		leasePerPriceRepository.deleteAll();
+//		leasePerPriceRepository.save(leasePerPriceList);
 		
 //		List<PyeongSellingPrice> sellingList = pyeongSellingRepository.findAll();
 //		List<PyeongLeasePrice> leaseList = pyeongLeaseRepository.findAll();
 		
+	
 		//지인1
 		AnalyzeGin<PyeongSellingPrice, MarketGinSelling> analyzeGinSelling = 
 				new AnalyzeGin<PyeongSellingPrice, MarketGinSelling>(sellingList, MarketGinSelling.class);
 		
 		List<MarketGinSelling> ginSellingList = analyzeGinSelling.analyze();
-		marketGinSellingRepository.deleteAll();
-		marketGinSellingRepository.save(ginSellingList);
+//		marketGinSellingRepository.deleteAll();
+//		marketGinSellingRepository.save(ginSellingList);
 		
 		
 		//지인2
@@ -111,11 +120,146 @@ public class MarketService {
 				new AnalyzeGin<PyeongLeasePrice, MarketGinLease>(leaseList, MarketGinLease.class);
 		
 		List<MarketGinLease> ginLeaseList = analyzeGinLease.analyze();
-		marketGinLeaseRepository.deleteAll();
-		marketGinLeaseRepository.save(ginLeaseList);		
+//		marketGinLeaseRepository.deleteAll();
+//		marketGinLeaseRepository.save(ginLeaseList);
+		
+		List<TotalMarket> resultList = makeTotalMarketEntities(sellingList, leaseList, leasePerPriceList, ginSellingList, ginLeaseList);
+		totalMarketRepository.deleteAll();
+		totalMarketRepository.save(resultList);
 		
 	}
 
+	public List<TotalMarket> calcurateRateOfEarning(final List<TotalMarket> _list) {
+		List<TotalMarket> listResult = new ArrayList<TotalMarket>();
+		
+		// 추출된 결과에서 불필요한 정보를 제거하자
+		Map<String, List<TotalMarket>> mapTarget = new HashMap<String, List<TotalMarket>>();
+		Map<String, List<TotalMarket>> mapInput = groupByClassificationMap(_list);
+
+		for (Entry<String, List<TotalMarket>> cls : mapInput.entrySet()) {
+			List<TotalMarket> listTarget = new ArrayList<TotalMarket>();
+			List<TotalMarket> list = cls.getValue();
+			Collections.sort(list);
+
+			TotalMarket curr = null;
+			TotalMarket prev = list.get(0);
+			for (int i = 1; i < list.size(); i++) {
+				curr = list.get(i);
+				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
+				double interval = curr.getDate().getTime() - prev.getDate().getTime();
+
+				if (interval <= MILESECONDS_OF_ONE_WEEK) {
+					prev = curr;
+					continue;
+				}
+				listTarget.add(curr);
+			}
+
+			mapTarget.put(cls.getKey(), listTarget);
+		}
+
+		List<TotalMarket> listAll = totalMarketRepository.findAll();
+		Map<String, List<TotalMarket>> mapAll = groupByClassificationMap(listAll);
+		Map<String, Map<Date, TotalMarket>> mapDateAll = new HashMap<String, Map<Date, TotalMarket>>();
+		for (Entry<String, List<TotalMarket>> cls : mapAll.entrySet()) {
+			List<TotalMarket> list = cls.getValue();
+			Map<Date, TotalMarket> m = new HashMap<Date, TotalMarket>();
+			for(TotalMarket item : list) {
+				m.put(item.getDate(), item);
+			}
+			mapDateAll.put(cls.getKey(), m);
+		}
+		
+		// 수익률 계산. 일단 default로 2년 (104주)
+		for (Entry<String, List<TotalMarket>> cls : mapTarget.entrySet()) {
+			List<TotalMarket> list = cls.getValue();
+			Map<Date, TotalMarket> mapSearch = mapDateAll.get(cls.getKey());
+			for (TotalMarket item : list) {
+				Date date = new Date(item.getDate().getTime() + INTERVAL_FOR_EARNING_RATE * MILESECONDS_OF_ONE_WEEK);
+				TotalMarket toItem = mapSearch.get(date);
+				if(toItem != null) {
+					item.setValue( (toItem.getSellingPrice()-item.getSellingPrice()) / item.getSellingPrice());
+					listResult.add(item);
+				}
+			}
+		}
+
+		return listResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Iterable<?> calcurateRateOfEarning(final List<LeasePerPrice> _rateList, final List<MarketGinSelling> _sellingList, final List<MarketGinLease> _leaseList) {
+		List<EarningRate> extractList = null;
+		
+		Map<String, List<LeasePerPrice>> rateMap = null;
+		Map<String, List<MarketGinSelling>> sellingMap = null;
+		Map<String, List<MarketGinLease>> leaseMap = null;
+		
+		// 검색된 지역 전체에 대한 Set 만들기
+		Set<String> classSet = new HashSet<String>();
+		int numOfConditions = 0;
+		if(_rateList != null) {
+			rateMap = groupByClassificationMap(_rateList);
+			classSet.addAll(rateMap.keySet());
+			numOfConditions++;
+		}
+		if(_sellingList != null) {
+			sellingMap = groupByClassificationMap(_sellingList);
+			classSet.addAll(sellingMap.keySet());
+			numOfConditions++;
+		}
+		if(_leaseList != null) {
+			leaseMap = groupByClassificationMap(_leaseList);
+			classSet.addAll(leaseMap.keySet());
+			numOfConditions++;
+		}
+		
+		// resultList 구하기
+		if(numOfConditions==1) {
+			Map<String, List<Market>> map = (Map<String, List<Market>>) ((rateMap!=null) ? rateMap : ((sellingMap!=null) ? sellingMap : leaseMap));
+			extractList = calcurateEarningRate(map);
+			
+		} else if(numOfConditions==2) {
+			if(rateMap==null) {
+				extractList = calcurateEarningRate(sellingMap, leaseMap);
+			}else if(sellingMap==null) {
+				extractList = calcurateEarningRate(rateMap, leaseMap);
+			}else if(leaseMap==null) {
+				extractList = calcurateEarningRate(rateMap, sellingMap);
+			}
+						
+		} else if(numOfConditions==3) {
+			extractList = calcurateEarningRate(rateMap, sellingMap, leaseMap);
+			
+		} else {
+			logger.error("Invalid condition. 수익율 계산 조건이 없음");
+		}
+		
+		//추출된 결과에서 불필요한 정보를 제거하자
+		List<EarningRate> resultList = new ArrayList<EarningRate>();
+		Map<String, List<EarningRate>> map = groupByClassificationMap(resultList);
+		
+		for(Entry<String, List<EarningRate>> cls : map.entrySet()) {
+			List<EarningRate> list = cls.getValue();
+			Collections.sort(list);
+			
+			EarningRate curr=null;
+			EarningRate prev=list.get(0);
+			for(int i=1; i<list.size(); i++) {
+				curr = list.get(i);
+				//예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
+				double interval = curr.getDate().getTime()-prev.getDate().getTime();
+				
+				if(interval<=MILESECONDS_OF_ONE_WEEK) {
+					prev = curr;
+					continue;
+				}
+				resultList.add(curr);
+			}
+		}
+		
+		return resultList;
+	}
 	
 	private List<LeasePerPrice> analyzeLeasePerPrice(List<PyeongSellingPrice> _sellingList, List<PyeongLeasePrice> _leaseList) {
 		List<LeasePerPrice> resultLists = new ArrayList<LeasePerPrice>();
@@ -164,7 +308,81 @@ public class MarketService {
 		return resultLists;
 	}
 	
-	
+	private List<TotalMarket> makeTotalMarketEntities(List<PyeongSellingPrice> sellingList, List<PyeongLeasePrice> leaseList, 
+														List<LeasePerPrice> leasePerPriceList, List<MarketGinSelling> ginSellingList, List<MarketGinLease> ginLeaseList) 
+	{
+		List<TotalMarket> resultList = new ArrayList<TotalMarket>();
+		Map<String, List<PyeongSellingPrice>> mapSelling = groupByClassificationMap(sellingList);
+		Map<String, List<PyeongLeasePrice>> mapLease = groupByClassificationMap(leaseList);
+		Map<String, List<LeasePerPrice>> mapRate = groupByClassificationMap(leasePerPriceList);
+		Map<String, List<MarketGinSelling>> mapGinSelling = groupByClassificationMap(ginSellingList);
+		Map<String, List<MarketGinLease>> mapGinLease = groupByClassificationMap(ginLeaseList);
+		
+		// validation check
+		Set<String> setSelling = mapSelling.keySet();
+		Set<String> setLease = mapLease.keySet();
+		Set<String> setRate = mapRate.keySet();
+//		Set<String> setGinSelling = mapGinSelling.keySet();
+//		Set<String> setGinLease = mapGinLease.keySet();
+		if(!setSelling.equals(setLease) 
+				|| !setSelling.equals(setRate)){
+//				|| !setSelling.equals(setGinSelling)
+//				|| !setSelling.equals(setGinLease)) {
+			logger.error("ERROR : invalid classification");
+			return null;
+		}
+		
+		for(String key : setSelling) {
+			Map<Date, TotalMarket> resultMap = new HashMap<Date, TotalMarket>();
+			List<PyeongSellingPrice> sellings = mapSelling.get(key);
+			Collections.sort(sellings, Collections.reverseOrder());
+			for(PyeongSellingPrice item : sellings) {
+				TotalMarket newItem = new TotalMarket();
+				newItem.setMarket(item);
+				newItem.setSellingPrice(item.getValue());
+				
+				resultMap.put(newItem.getDate(), newItem);
+			}
+			
+			List<PyeongLeasePrice> leases = mapLease.get(key);
+			if(leases != null) {
+				for(PyeongLeasePrice item : leases) {
+					TotalMarket newItem = resultMap.get(item.getDate());
+					newItem.setLeasePrice(item.getValue());
+				}
+			}
+			
+			List<LeasePerPrice> rates = mapRate.get(key);
+			if(rates != null) {
+				for(LeasePerPrice item : rates) {
+					TotalMarket newItem = resultMap.get(item.getDate());
+					Double value = (item.getValue()!=null) ? item.getValue()*100.0 : null;
+					newItem.setGinRate(value);
+				}
+			}
+			
+			List<MarketGinSelling> ginSellings = mapGinSelling.get(key);
+			if(ginSellings != null) {
+				for(MarketGinSelling item : ginSellings) {
+					TotalMarket newItem = resultMap.get(item.getDate());
+					newItem.setGinSelling(item.getValue());
+				}
+			}
+			
+			List<MarketGinLease> ginLeases = mapGinLease.get(key);
+			if(ginLeases != null) {
+				for(MarketGinLease item : ginLeases) {
+					TotalMarket newItem = resultMap.get(item.getDate());
+					newItem.setGinLease(item.getValue());
+				}
+			}
+			
+			resultList.addAll(resultMap.values());
+
+		}
+		
+		return resultList;
+	}
 	private <Q extends Market> Map<String, List<Q>> groupByClassificationMap(List<Q> list) {
 		Map<String, List<Q>> map = new HashMap<String, List<Q>>();
 		for(Q e : list) {
@@ -179,6 +397,84 @@ public class MarketService {
 			subList.add(e);
 		}
 		return map;
+	}
+	
+	private <T extends Market> List<EarningRate> calcurateEarningRate(Map<String, List<T>> map) {
+		List<EarningRate> resultList = new ArrayList<EarningRate>();
+		
+		for(Entry<String, List<T>> cls : map.entrySet()) {
+			List<T> list = cls.getValue();
+			Collections.sort(list);
+			Market entity;
+			for(int i=0; i<list.size(); i++) {
+				entity = list.get(i);
+				
+//				//예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
+//				if(entity!=null && prevEntity!=null && (entity.getDate().getTime()-prevEntity.getDate().getTime())==MILESECONDS_OF_ONE_WEEK) {
+//					prevEntity = entity;
+//					continue;
+//				}
+				
+				EarningRate newItem = new EarningRate();
+				newItem.setClassification(entity.getClassification());
+				newItem.setDate(entity.getDate());
+				resultList.add(newItem);
+			}
+		}
+		
+		return resultList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Market, U extends Market> List<EarningRate> calcurateEarningRate(Map<String, List<T>> map1, Map<String, List<U>> map2) {
+		List<EarningRate> resultList = new ArrayList<EarningRate>();
+		
+		Set<String> classSet = new HashSet<String>();
+		classSet.addAll(map1.keySet());
+		classSet.addAll(map2.keySet());
+		
+		for(String key : classSet) {
+			List<Market> list1 = (List<Market>) map1.get(key);
+			List<Market> list2 = (List<Market>) map2.get(key);
+			
+			if(list1==null || list2==null) {
+				continue;
+			}
+			
+			Collections.sort(list1);
+			Collections.sort(list2);
+			
+			Market entity1, entity2;
+			int size1=list1.size();
+			int size2=list2.size();
+			for(int i=0,j=0; i<size1 && j<size2; ) {
+				entity1 = list1.get(i);
+				entity2 = list2.get(j);
+				
+				if(entity1.getDate().equals(entity2.getDate())) {
+					EarningRate newItem = new EarningRate();
+					newItem.setClassification(entity1.getClassification());
+					newItem.setDate(entity1.getDate());
+					resultList.add(newItem);
+					i++; j++;
+					
+				}else if(entity1.getDate().after(entity2.getDate())) {
+					j++;
+				}else {
+					i++;
+				}					
+			}
+		}
+		
+		return resultList;
+	}
+	
+	private <T extends Market, U extends Market, V extends Market> List<EarningRate> calcurateEarningRate(Map<String, List<T>> map1, Map<String, List<U>> map2, Map<String, List<V>> map3) {
+		List<EarningRate> earningRateList = calcurateEarningRate(map1, map2);
+		Map<String, List<EarningRate>> earningRateMap = groupByClassificationMap(earningRateList);
+		
+		List<EarningRate> resultList = calcurateEarningRate(earningRateMap, map3);
+		return resultList;
 	}
 	
 	class AnalyzeMarket<T extends Market, U extends Market, V extends Market> {
@@ -428,5 +724,5 @@ public class MarketService {
 		}
 		
 	}
-	
+
 }
