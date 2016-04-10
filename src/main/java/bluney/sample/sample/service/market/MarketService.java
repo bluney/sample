@@ -129,7 +129,7 @@ public class MarketService {
 		
 	}
 
-	public List<TotalMarket> calcurateRateOfEarning(final List<TotalMarket> _list) {
+	public List<TotalMarket> calcurateRateOfEarning(final List<TotalMarket> _list, int sellTiming) {
 		List<TotalMarket> listResult = new ArrayList<TotalMarket>();
 		
 		// 추출된 결과에서 불필요한 정보를 제거하자
@@ -146,13 +146,12 @@ public class MarketService {
 			for (int i = 1; i < list.size(); i++) {
 				curr = list.get(i);
 				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
-				double interval = curr.getDate().getTime() - prev.getDate().getTime();
+				long interval = curr.getDate().getTime() - prev.getDate().getTime();
 
-				if (interval <= MILESECONDS_OF_ONE_WEEK) {
-					prev = curr;
-					continue;
+				if (interval > MILESECONDS_OF_ONE_WEEK) {
+					listTarget.add(curr);
 				}
-				listTarget.add(curr);
+				prev = curr;
 			}
 
 			mapTarget.put(cls.getKey(), listTarget);
@@ -175,7 +174,7 @@ public class MarketService {
 			List<TotalMarket> list = cls.getValue();
 			Map<Date, TotalMarket> mapSearch = mapDateAll.get(cls.getKey());
 			for (TotalMarket item : list) {
-				Date date = new Date(item.getDate().getTime() + INTERVAL_FOR_EARNING_RATE * MILESECONDS_OF_ONE_WEEK);
+				Date date = new Date(item.getDate().getTime() + (long)(sellTiming*MILESECONDS_OF_ONE_WEEK));
 				TotalMarket toItem = mapSearch.get(date);
 				if(toItem != null) {
 					item.setValue( (toItem.getSellingPrice()-item.getSellingPrice()) / item.getSellingPrice());
@@ -383,6 +382,8 @@ public class MarketService {
 		
 		return resultList;
 	}
+	
+	
 	private <Q extends Market> Map<String, List<Q>> groupByClassificationMap(List<Q> list) {
 		Map<String, List<Q>> map = new HashMap<String, List<Q>>();
 		for(Q e : list) {

@@ -1,14 +1,21 @@
-<label th:text="'수익율 = ' + ${earning_rate_average} + '%'"></label>
+<blockquote>
+	<label th:text="'총 수익율 = ' + ${#numbers.formatDecimal(earning_rate_total, 1, 2, 'POINT')} + '%,&nbsp; &nbsp;'"></label>
+	<label th:text="'연평균 수익율 = ' + ${#numbers.formatDecimal(earning_rate_average, 1, 2, 'POINT')} + '%,&nbsp; &nbsp; &nbsp; &nbsp;'"></label>
+	<label th:text="'수익 = ' + ${earning_rate_increase_num} + '건,&nbsp; &nbsp;'"></label>
+	<label th:text="'손실  = ' + ${earning_rate_decrease_num} + '건'"></label>
+</blockquote>
 <table th:if="${earning_rate_entity}" class="table display table-striped table-hover table-heading table-datatable" id="tableEarningRate">
 	<thead>
 		<tr>
-			<th colspan='7'>수익률 계산</th>
+			<th colspan='9'>수익률 계산</th>
 		</tr>
 		<tr>
 			<th style="text-align: center;">랭킹</th>
 			<th style="text-align: center;">지역명</th>
 			<th style="text-align: center;">DATE</th>
-			<th style="text-align: center;">수익율 (단위:%)</th>
+			<th style="text-align: center;">수익율 (수익금액)</th>
+			<th style="text-align: center;">매매가 </th>
+			<th style="text-align: center;">전세가 </th>
 			<th style="text-align: center;">전세율 </th>
 			<th style="text-align: center;">매매증감 </th>
 			<th style="text-align: center;">전세증감 </th>
@@ -21,10 +28,19 @@
 			<td style="text-align: center;" th:text="${idx.count}">1</td>
 			<td style="text-align: center;" th:text="${entity.classification}">1</td>
 			<td style="text-align: center;" th:text="${#dates.format(entity.date, 'yyyy-MM-dd')}">1</td>
-			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value*100.0, 0, 2, 'POINT')}">13.10</td>
-			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginRate, 0, 2, 'POINT')}">13.10</td>
-			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginSelling, 0, 2, 'POINT')}">13.10</td>
-			<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.ginLease, 0, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:if="${entity.value}" th:text="${#numbers.formatDecimal(entity.value*100.0, 1, 2, 'POINT')} + '% ('  + ${#numbers.formatDecimal(entity.sellingPrice*(1+entity.value)-entity.sellingPrice, 1, 2, 'POINT')}+ '만원)'">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.value}" th:text="'-'">13.10</td>
+			<td style="text-align: center;" th:if="${entity.sellingPrice}" th:text="${#numbers.formatDecimal(entity.sellingPrice, 1, 0, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.sellingPrice}" th:text="'-'">13.10</td>
+			<td style="text-align: center;" th:if="${entity.leasePrice}" th:text="${#numbers.formatDecimal(entity.leasePrice, 1, 0, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.leasePrice}" th:text="'-'">13.10</td>
+			<td style="text-align: center;" th:if="${entity.ginRate}" th:text="${#numbers.formatDecimal(entity.ginRate, 1, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.ginRate}" th:text="'-'">13.10</td>
+			<td style="text-align: center;" th:if="${entity.ginSelling}" th:text="${#numbers.formatDecimal(entity.ginSelling, 1, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.ginSelling}" th:text="'-'">13.10</td>
+			<td style="text-align: center;" th:if="${entity.ginLease}" th:text="${#numbers.formatDecimal(entity.ginLease, 1, 2, 'POINT')}">13.10</td>
+			<td style="text-align: center;" th:unless="${entity.ginLease}" th:text="'-'">13.10</td>
 		</tr>
 	</tbody>
 </table>
+<script th:src="@{/resources/js/sample-earning-rate.js}" type="text/javascript"></script>

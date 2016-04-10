@@ -7,35 +7,14 @@
 		</ol>
 	</div>
 </div>
-<div class="row">
-	<div class="col-xs-12">
-		<div class="box">
-			<div class="box-header">
-				<div class="box-name">
-					<i class="fa fa-usd"></i>
-					<span>시계열 데이터 입력 / 분석 </span>
-				</div>
-				<div class="box-icons">
-					<a class="collapse-link">
-						<i class="fa fa-chevron-up"></i>
-					</a>
-				</div>
-				<div class="no-move"></div>
-			</div>
-			<div class="box-content">
-				<button type="button" class="btn btn-default" onclick="importExcel()">Import 시계열 Data</button>
-				<button type="button" class="btn btn-default" onclick="analyzeMarketTimeSeries()">시계열 Data 분석</button>
-			</div>
-		</div>
-	</div>
-</div>
+
 <div class="row">
 	<div class="col-xs-12">
 		<div class="box">
 			<div class="box-header">
 				<div class="box-name">
 					<i class="fa fa-linux"></i>
-					<span>평당 부동산 가격</span>
+					<span th:if="${pyeong_selling_price_entity}" th:text="'평당 부동산 가격 ('+${#dates.format(pyeong_selling_price_entity[0].date, 'yyyy-MM-dd')}+')'"></span>
 				</div>
 				<div class="box-icons">
 					<a class="collapse-link">
@@ -101,7 +80,7 @@
 			<div class="box-header">
 				<div class="box-name">
 					<i class="fa fa-linux"></i>
-					<span>지인 데이터</span>
+					<span th:if="${pyeong_selling_price_entity}" th:text="'지인 데이터 ('+${#dates.format(lease_per_selling_entity[0].date, 'yyyy-MM-dd')}+')'"></span>
 				</div>
 				<div class="box-icons">
 					<a class="collapse-link">
@@ -194,37 +173,111 @@
 				<div class="no-move"></div>
 			</div>
 			<div class="box-content">
-				<div class="row form-group">
-					<div class="col-sm-12">
-						<div class="col-sm-3 checkbox">
+				<div class="row form-group container-fluid">
+					<table class="table table-bordered" id="tableCalcurateForm">
+						<tbody>
+							<tr>
+								<td colspan='3'>수익률 검색 조건</td>
+								<td rowspan='2' class="text-center" style="vertical-align: middle;">
+									<label>보유기간&nbsp;&nbsp;</label>
+									<input type="text" id="input-spinner-timing" class="form-control" />
+								</td>
+								<td class="text-center" rowspan='2' style="vertical-align: middle;">
+									<buutton type="button" class="btn btn-primary btn-block" onclick="calcurateRateOfEarning()">수익률<br/>계산하기</buutton> 
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="checkbox">
+									<label>
+										<input type="checkbox" id="chk-rate" class="calcurate-rate-of-earning" checked="true" />&nbsp;전세율&nbsp;&nbsp;&nbsp;
+										<i class="fa fa-square-o"></i>
+									</label>
+									<input type="text" id="input-spinner-rate" class="form-control" placeholder="전세율" />
+									</div>								
+								</td>
+								<td>
+									<div class="checkbox">
+									<label>
+										<input type="checkbox" id="chk-selling" class="calcurate-rate-of-earning" checked="true" />&nbsp;매매증가율&nbsp;&nbsp;&nbsp;
+										<i class="fa fa-square-o"></i>
+									</label>
+									<input type="text" id="input-spinner-selling" class="col-sm-1 form-control" placeholder="매매증가율" />
+									</div>
+								</td>
+								<td>
+									<div class="checkbox">
+									<label>
+										<input type="checkbox" id="chk-lease" class="calcurate-rate-of-earning" checked="true" />&nbsp;전세증가율&nbsp;&nbsp;&nbsp;
+										<i class="fa fa-square-o"></i>
+									</label>
+									<input type="text" id="input-spinner-lease" class="form-control" placeholder="전세증가율" />
+									</div>
+								</td>
+							</tr>
+						
+						</tbody>
+					</table>
+					<!-- 
+					<div class="col-sm-10">
+						<div class="col-sm-3 checkbox" style="margin-top: 0px;">
 							<label>
 								<input type="checkbox" id="chk-rate" class="calcurate-rate-of-earning" checked="true" />전세율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
+								<i class="fa fa-square-o"></i>
 							</label>
 							<input type="text" id="input-spinner-rate" class="form-control" placeholder="전세율" />
 						</div>
-						<div class="col-sm-3 checkbox">
+						<div class="col-sm-3 checkbox" style="margin-top: 0px;">
 							<label>
-								<input type="checkbox" id="chk-selling" class="calcurate-rate-of-earning" />매매증가율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
+								<input type="checkbox" id="chk-selling" class="calcurate-rate-of-earning" checked="true" />매매증가율&nbsp;&nbsp;&nbsp;
+								<i class="fa fa-square-o"></i>
 							</label>
 							<input type="text" id="input-spinner-selling" class="col-sm-1 form-control" placeholder="매매증가율" />
 						</div>
-						<div class="col-sm-3 checkbox">
+						<div class="col-sm-3 checkbox" style="margin-top: 0px;">
 							<label>
-								<input type="checkbox" id="chk-lease" class="calcurate-rate-of-earning" />전세증가율&nbsp;&nbsp;&nbsp;
-								<i class="fa fa-square-o small"></i>
+								<input type="checkbox" id="chk-lease" class="calcurate-rate-of-earning" checked="true" />전세증가율&nbsp;&nbsp;&nbsp;
+								<i class="fa fa-square-o"></i>
 							</label>
 							<input type="text" id="input-spinner-lease" class="form-control" placeholder="전세증가율" />
 						</div>
-						<div class="col-sm-3">
-							<button type="button" class="btn" onclick="calcurateRateOfEarning()">수익율 계산</button>
+						<div class="col-sm-3" style="margin-top: 0px;">
+							<label>보유기간&nbsp;&nbsp;</label>
+							<input type="text" id="input-spinner-timing" class="form-control" />
 						</div>
 					</div>
+					<div class="col-sm-2">						
+						<div class="col-sm-12" style="margin-top: 0px;">
+							<input type="button" class="btn btn-primary btn-block" onclick="calcurateRateOfEarning()" value="수익률 계산하기" />
+						</div>
+					</div>
+					!-->
 				</div>
 			</div>
 			<div class="col-xs-12 col-sm-12 box-content table-responsive" id="divEarningRate">
 				
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box">
+			<div class="box-header">
+				<div class="box-name">
+					<i class="fa fa-usd"></i>
+					<span>시계열 데이터 입력 / 분석 </span>
+				</div>
+				<div class="box-icons">
+					<a class="collapse-link" data-toggle="collapse" >
+						<i class="fa fa-chevron-up"></i>
+					</a>
+				</div>
+				<div class="no-move"></div>
+			</div>
+			<div class="box-content">
+				<button type="button" class="btn btn-default" onclick="importExcel()">Import 시계열 Data</button>
+				<button type="button" class="btn btn-default" onclick="analyzeMarketTimeSeries()">시계열 Data 분석</button>
 			</div>
 		</div>
 	</div>

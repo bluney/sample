@@ -2,6 +2,7 @@ package bluney.sample.sample.controller.market;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +45,7 @@ public class MarketController {
 	public final static String MARKET_GIN_LEASE_ENTITY = "market_gin_lease_entity";
 	public final static String EARNING_RATE_ENTITY = "earning_rate_entity";
 	public final static String MARKET_ENTITY = "market_entity";
+	public final static String DATES_ENTITY_FOR_MARKET = "dates_entity_for_market";
 	
 	
 	@Resource(name="marketService")
@@ -71,13 +73,14 @@ public class MarketController {
 		List<LeasePerPrice> leasePerPriceList = new ArrayList<LeasePerPrice>();
 		List<MarketGinSelling> marketGinSellingList = new ArrayList<MarketGinSelling>();
 		List<MarketGinLease> marketGinLeaseList = new ArrayList<MarketGinLease>();
+		List<Date> dateList = new ArrayList<Date>();
 		
 		for(TotalMarket entity : marketList) {
 			if(entity.getSellingPrice() != null) {
 				PyeongSellingPrice item = new PyeongSellingPrice();
 				item.setMarket(entity);
 				item.setValue(entity.getSellingPrice());
-				pyeongSellingList.add(item);
+				pyeongSellingList.add(item);				
 			}
 			if(entity.getLeasePrice() != null) {
 				PyeongLeasePrice item = new PyeongLeasePrice();
@@ -103,6 +106,8 @@ public class MarketController {
 				item.setValue(entity.getGinLease());
 				marketGinLeaseList.add(item);
 			}
+			
+			dateList.add(entity.getDate());
 		}
 		
 		Collections.sort(pyeongSellingList, Market.getValueSorter());
@@ -110,6 +115,7 @@ public class MarketController {
 		Collections.sort(leasePerPriceList, Market.getValueSorter());
 		Collections.sort(marketGinSellingList, Market.getValueSorter());
 		Collections.sort(marketGinLeaseList, Market.getValueSorter());
+		Collections.sort(dateList, Collections.reverseOrder());
 		
 //		Iterable<?> pyeongSellingList = pyeongSellingPriceService.find(query, null);
 //		Iterable<?> pyeongLeaseList = pyeongLeasePriceService.find(query, null);
@@ -122,7 +128,7 @@ public class MarketController {
 		model.addAttribute(LEASE_PER_SELLING_ENTITY, leasePerPriceList);
 		model.addAttribute(MARKET_GIN_SELLING_ENTITY, marketGinSellingList);
 		model.addAttribute(MARKET_GIN_LEASE_ENTITY, marketGinLeaseList);
-		
+		model.addAttribute(DATES_ENTITY_FOR_MARKET, dateList);
 		
 		return "/service/market/market.html";
 	}
@@ -144,9 +150,10 @@ public class MarketController {
 		Double pRate = DataConvertUtil.stringToDouble(map.get("rate"));
 		Double pSelling = DataConvertUtil.stringToDouble(map.get("selling"));
 		Double pLease = DataConvertUtil.stringToDouble(map.get("lease"));
+		int pTiming = DataConvertUtil.stringToInteger(map.get("timing"));
 		
 		logger.debug("calcurateRateOfEarning: CONDITION - rate=" + pRate + ", selling=" + pSelling + ", lease=" + pLease);
-		
+		logger.debug("calcurateRateOfEarning:           - timing=" + pTiming);
 //		List<LeasePerPrice> leasePerPriceList = null;
 //		List<MarketGinSelling> marketGinSellingList = null;
 //		List<MarketGinLease> marketGinLeaseList  = null;
@@ -177,7 +184,7 @@ public class MarketController {
 		query.setGinLease(pLease);
 		
 		List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
-		List<TotalMarket> resultList = service.calcurateRateOfEarning(totalMarketList);
+		List<TotalMarket> resultList = service.calcurateRateOfEarning(totalMarketList, pTiming);
 		Collections.sort(resultList, Market.getValueSorter());
 		Double average = 0.0;
 		int numOfIncrease = 0;
@@ -188,15 +195,17 @@ public class MarketController {
 			if (value > 0.0) {
 				numOfIncrease++;
 			}else if (value < 0.0) {
-				numOfDecrease--;
+				numOfDecrease++;
 			}
 		}
 		
 		average /= (double) resultList.size();
 		
 		model.addAttribute(EARNING_RATE_ENTITY, resultList);
-		model.addAttribute("earning_rate_average", average*100.0);
-
+		model.addAttribute("earning_rate_total", average*100.0);
+		model.addAttribute("earning_rate_average", average*100.0/((double)pTiming/(365.0/7.0)));
+		model.addAttribute("earning_rate_increase_num", numOfIncrease);
+		model.addAttribute("earning_rate_decrease_num", numOfDecrease);
 		return "/service/market/EarningRate.html";
 	}
 	

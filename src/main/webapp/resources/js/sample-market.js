@@ -21,26 +21,21 @@ function analyzeMarketTimeSeries(){
 
 function calcurateRateOfEarning(){
 	var hasParam = false;
-	var param = "?";
+	var rate = null;
+	var selling = null;
+	var lease = null;
+
 	if($('#chk-rate').is(":checked")) {
-		param += "rate=";
-		param += $('#input-spinner-rate').spinner("value");
-		hasParam = true;
+		rate = $('#input-spinner-rate').pcntspinner("value");
 	}
 	if($('#chk-selling').is(":checked")) {
-		if(hasParam) {
-			param += "&";
-		}
-		param += "selling=";
-		param += $('#input-spinner-selling').spinner("value");
-		hasParam = true;
+		selling = $('#input-spinner-selling').pcntspinner("value");
 	}
 	if($('#chk-lease').is(":checked")) {
-		if(hasParam) {
-			param += "&";
-		}
-		param += "lease=";
-		param += $('#input-spinner-lease').spinner("value");
+		lease = $('#input-spinner-lease').pcntspinner("value");
+	}
+	
+	if(rate || selling || lease) {
 		hasParam = true;
 	}
 	
@@ -52,9 +47,10 @@ function calcurateRateOfEarning(){
 	$.ajax({
 		type : "GET",
 		url : "/service/market/calcurateRateOfEarning",//+param,
-		data : {"rate" : $('#input-spinner-rate').spinner("value"),
-				"selling" : $('#input-spinner-selling').spinner("value"),
-				"lease" : $('#input-spinner-lease').spinner("value")},
+		data : {"rate" : rate,
+				"selling" : selling,
+				"lease" : lease,
+				"timing" : $('#input-spinner-timing').weekspinner("value")},
 		success : function (response) {
 			$("#divEarningRate").html(response);
 		}
@@ -100,6 +96,18 @@ function MakeSelect2(){
 		$(this).find('label input[type=text]').attr('placeholder', 'Search');
 	});
 }
+
+$.widget( "ui.pcntspinner", $.ui.spinner, {
+    _format: function(value) { return value + ' %'; },
+    _parse: function(value) { return parseFloat(value); }
+});
+
+$.widget( "ui.weekspinner", $.ui.spinner, {
+    _format: function(value) { return value + ' 주'; },
+    _parse: function(value) { return parseInt(value); }
+});
+
+
 $(document).ready(function() {
 	// Load Datatables and run plugin on tables 
 	LoadDataTablesScripts(AllTables);
@@ -107,7 +115,6 @@ $(document).ready(function() {
 	// Add Drag-n-Drop feature
 	WinMove();
 	
-
 	$('.calcurate-rate-of-earning').change(function() {
 		var selector;
 		var id = $(this).attr("id");
@@ -120,32 +127,40 @@ $(document).ready(function() {
 		}
 	
 		if($(this).is(":checked")) {
-			//alert("checked id=" + $(this).attr("id"));
 			selector.spinner("option", "disabled", false);
-			return;
+		} else {
+			selector.spinner("option", "disabled", true);
 		}
-		//alert("unchecked id=" + $(this).attr("id"));
-		selector.spinner("option", "disabled", true);
-		// 'unchecked' event code
 	});
 	
-	$("#input-spinner-rate").spinner({
+	$("#input-spinner-rate").pcntspinner({
 		min:50,
 		max:100,
 		step:1
-	}).val(75).width(50);
+	}).width(60);
 
-	$("#input-spinner-selling").spinner({
+	$("#input-spinner-selling").pcntspinner({
 		min:0.0,
 		max:10.0,
-		step:0.1,
-		disabled:true
-	}).val(5.0).width(50);
+		step:0.1
+//		disabled:true
+	}).width(60);
 	
-	$("#input-spinner-lease").spinner({
+	$("#input-spinner-lease").pcntspinner({
 		min:0.0,
 		max:10.0,
-		step:0.1,
-		disabled:true
-	}).val(5.0).width(50);
+		step:0.1
+	}).width(60);
+	
+	$("#input-spinner-rate").pcntspinner("value", 75);
+	$("#input-spinner-selling").pcntspinner("value", 5.0);
+	$("#input-spinner-lease").pcntspinner("value", 5.0);
+	
+	$("#input-spinner-timing").weekspinner({
+		min:4*6,
+		max:4*36,
+		step:4
+	}).width(60);
+	$("#input-spinner-timing").weekspinner("value", 104);
+
 });
