@@ -6,17 +6,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.u2ware.springfield.repository.EntityRepository;
 import com.u2ware.springfield.service.EntityService;
 
 import bluney.sample.sample.common.util.DataConvertUtil;
@@ -24,10 +28,12 @@ import bluney.sample.sample.common.util.DateUtil;
 import bluney.sample.sample.customtype.market.Market;
 import bluney.sample.sample.domain.lease.PyeongLeasePrice;
 import bluney.sample.sample.domain.market.TotalMarket;
+import bluney.sample.sample.domain.market.earning.stat.EarningStat;
 import bluney.sample.sample.domain.market.gin.lease.MarketGinSelling;
 import bluney.sample.sample.domain.market.gin.selling.MarketGinLease;
 import bluney.sample.sample.domain.market.rate.LeasePerPrice;
 import bluney.sample.sample.domain.selling.PyeongSellingPrice;
+import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.service.market.MarketService;
 import bluney.sample.sample.service.market.query.TotalMarketQuery;
 import lombok.Getter;
@@ -54,6 +60,8 @@ public class MarketController {
 	@Resource(name="totalMarketService")
 	private EntityService<TotalMarket, TotalMarketQuery> totalMarketService;
 
+	@Autowired @Qualifier("earningStatRepository")
+	private EntityRepository<EarningStat, Integer> earningStatRepository;
 	
 	@RequestMapping(value = "/market.html", method = RequestMethod.GET)
 	public String sampleMarket(@RequestParam HashMap<String, String> map, Model model) {
@@ -206,7 +214,160 @@ public class MarketController {
 		model.addAttribute("earning_rate_average", average*100.0/((double)pTiming/(365.0/7.0)));
 		model.addAttribute("earning_rate_increase_num", numOfIncrease);
 		model.addAttribute("earning_rate_decrease_num", numOfDecrease);
+		
 		return "/service/market/EarningRate.html";
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/processBestCase", method = RequestMethod.GET)
+	public String processBestCase(@RequestParam HashMap<String, String> map, Model model) {
+		
+		logger.debug("processBestCase");
+		//service.processBestCase();
+		
+		int timing = 104;
+		List<EarningStat> earningStatList = new ArrayList<EarningStat>();
+		Map<String, Map<Date, TotalMarket>> mapDateAll = service.getMapDateAll();
+		
+		for(int i=26; i<27; i++) {
+			for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
+				TotalMarketQuery query = new TotalMarketQuery();
+				query.setGinRate(rate);
+				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+				
+				if(earningStat.getTotalMarketList().size() > 0) {
+					earningStat.setRate(rate);
+					earningStatList.add(earningStat);
+					
+					for(double selling = 2.0; selling<7.0; selling+=0.1) {
+						query.setGinSelling(selling);
+						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+						
+						if(stat.getTotalMarketList().size() > 0) {
+							stat.setRate(rate);
+							stat.setSelling(selling);
+							earningStatList.add(stat);		
+							
+							for(double lease = 2.0; lease<7.0; lease+=0.1) {
+								query.setGinSelling(lease);
+								List<TotalMarket> allConditionList = (List<TotalMarket>) totalMarketService.find(query, null);
+								EarningStat result = getEarningStat(allConditionList, timing, mapDateAll);
+								
+								if(result.getTotalMarketList().size() > 0) {
+									result.setRate(rate);
+									result.setSelling(selling);
+									result.setLease(lease);
+									earningStatList.add(result);					
+								} else {
+									break;
+								}
+							}
+						} else {
+							break;
+						}
+					}
+				} else {
+					break;
+				}
+			}
+
+			for(double selling = 2.0; selling<7.0; selling+=0.1) {
+				TotalMarketQuery query = new TotalMarketQuery();
+				query.setGinSelling(selling);
+				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+				
+				if(earningStat.getTotalMarketList().size() > 0) {
+					earningStat.setSelling(selling);
+					earningStatList.add(earningStat);	
+					
+					for(double lease = 2.0; lease<7.0; lease+=0.1) {
+						//TotalMarketQuery query = new TotalMarketQuery();
+						query.setGinSelling(lease);
+						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+						
+						if(stat.getTotalMarketList().size() > 0) {
+							stat.setSelling(selling);
+							stat.setLease(lease);
+							earningStatList.add(stat);					
+						} else {
+							break;
+						}
+					}
+				} else {
+					break;
+				}
+			}
+			
+			for(double lease = 2.0; lease<2.1; lease+=0.1) {
+				TotalMarketQuery query = new TotalMarketQuery();
+				query.setGinSelling(lease);
+				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+				
+				if(earningStat.getTotalMarketList().size() > 0) {
+					earningStat.setLease(lease);
+					earningStatList.add(earningStat);	
+					
+					for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
+						//TotalMarketQuery query = new TotalMarketQuery();
+						query.setGinRate(rate);
+						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+						
+						if(stat.getTotalMarketList().size() > 0) {
+							stat.setLease(lease);
+							stat.setRate(rate);
+							earningStatList.add(stat);	
+						} else {
+							break;
+						}
+					}
+				} else {
+					break;
+				}
+			}
+		}
+		
+		earningStatRepository.deleteAll();
+		earningStatRepository.save(earningStatList);
+		
+		return "";
+	}
+
+	private EarningStat getEarningStat(List<TotalMarket> totalMarketList, int sellingTiming, Map<String, Map<Date, TotalMarket>> mapDateAll) {
+		EarningStat earningStat = new EarningStat();
+		
+		List<TotalMarket> resultList = service.stasticEarningRate(totalMarketList, sellingTiming, mapDateAll);
+		Collections.sort(resultList, Market.getValueSorter());
+		Double averageTotal = 0.0;
+		int numOfIncrease = 0;
+		int numOfDecrease = 0;
+		for (TotalMarket item : resultList) {
+			Double value = item.getValue(); 
+			averageTotal += value;
+			if (value > 0.0) {
+				numOfIncrease++;
+			}else if (value < 0.0) {
+				numOfDecrease++;
+			}
+		}
+		
+		averageTotal /= (double) resultList.size();
+		Double averagePerYear = averageTotal / ((double)sellingTiming / (365.0/7.0));
+
+		earningStat.setNumOfIncrease(numOfIncrease);
+		earningStat.setNumOfDecrease(numOfDecrease);
+		earningStat.setAverageTotal(averageTotal);
+		earningStat.setAveragePerYear(averagePerYear);
+		earningStat.setTotalMarketList(resultList);
+		
+		earningStat.setInterval(sellingTiming);
+		
+		return earningStat;
 	}
 	
 }

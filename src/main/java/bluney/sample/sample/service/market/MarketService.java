@@ -148,10 +148,10 @@ public class MarketService {
 				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
 				long interval = curr.getDate().getTime() - prev.getDate().getTime();
 
-				if (interval > MILESECONDS_OF_ONE_WEEK) {
+				if (interval > MILESECONDS_OF_ONE_WEEK * 26) {
 					listTarget.add(curr);
+					prev = curr;
 				}
-				prev = curr;
 			}
 
 			mapTarget.put(cls.getKey(), listTarget);
@@ -169,7 +169,7 @@ public class MarketService {
 			mapDateAll.put(cls.getKey(), m);
 		}
 		
-		// 수익률 계산. 일단 default로 2년 (104주)
+		// 수익률 계산
 		for (Entry<String, List<TotalMarket>> cls : mapTarget.entrySet()) {
 			List<TotalMarket> list = cls.getValue();
 			Map<Date, TotalMarket> mapSearch = mapDateAll.get(cls.getKey());
@@ -186,6 +186,65 @@ public class MarketService {
 		return listResult;
 	}
 	
+	public List<TotalMarket> stasticEarningRate(final List<TotalMarket> _list, int sellTiming, Map<String, Map<Date, TotalMarket>> mapDateAll) {
+		List<TotalMarket> listResult = new ArrayList<TotalMarket>();
+		
+		// 추출된 결과에서 불필요한 정보를 제거하자
+		Map<String, List<TotalMarket>> mapTarget = new HashMap<String, List<TotalMarket>>();
+		Map<String, List<TotalMarket>> mapInput = groupByClassificationMap(_list);
+
+		for (Entry<String, List<TotalMarket>> cls : mapInput.entrySet()) {
+			List<TotalMarket> listTarget = new ArrayList<TotalMarket>();
+			List<TotalMarket> list = cls.getValue();
+			Collections.sort(list);
+
+			TotalMarket curr = null;
+			TotalMarket prev = list.get(0);
+			for (int i = 1; i < list.size(); i++) {
+				curr = list.get(i);
+				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
+				long interval = curr.getDate().getTime() - prev.getDate().getTime();
+
+				if (interval > MILESECONDS_OF_ONE_WEEK * 26) {
+					listTarget.add(curr);
+					prev = curr;
+				}
+			}
+
+			mapTarget.put(cls.getKey(), listTarget);
+		}
+
+		// 수익률 계산
+		for (Entry<String, List<TotalMarket>> cls : mapTarget.entrySet()) {
+			List<TotalMarket> list = cls.getValue();
+			Map<Date, TotalMarket> mapSearch = mapDateAll.get(cls.getKey());
+			for (TotalMarket item : list) {
+				Date date = new Date(item.getDate().getTime() + (long)(sellTiming*MILESECONDS_OF_ONE_WEEK));
+				TotalMarket toItem = mapSearch.get(date);
+				if(toItem != null) {
+					item.setValue( (toItem.getSellingPrice()-item.getSellingPrice()) / item.getSellingPrice());
+					listResult.add(item);
+				}
+			}
+		}
+
+		return listResult;
+	}
+	
+	public Map<String, Map<Date, TotalMarket>> getMapDateAll() {
+		List<TotalMarket> listAll = totalMarketRepository.findAll();
+		Map<String, List<TotalMarket>> mapAll = groupByClassificationMap(listAll);
+		Map<String, Map<Date, TotalMarket>> mapDateAll = new HashMap<String, Map<Date, TotalMarket>>();
+		for (Entry<String, List<TotalMarket>> cls : mapAll.entrySet()) {
+			List<TotalMarket> list = cls.getValue();
+			Map<Date, TotalMarket> m = new HashMap<Date, TotalMarket>();
+			for(TotalMarket item : list) {
+				m.put(item.getDate(), item);
+			}
+			mapDateAll.put(cls.getKey(), m);
+		}
+		return mapDateAll;
+	}
 	@SuppressWarnings("unchecked")
 	public Iterable<?> calcurateRateOfEarning(final List<LeasePerPrice> _rateList, final List<MarketGinSelling> _sellingList, final List<MarketGinLease> _leaseList) {
 		List<EarningRate> extractList = null;
@@ -258,6 +317,12 @@ public class MarketService {
 		}
 		
 		return resultList;
+	}
+	
+	public void processBestCase() {
+		List<TotalMarket> totalMarketList = totalMarketRepository.findAll();
+		
+		
 	}
 	
 	private List<LeasePerPrice> analyzeLeasePerPrice(List<PyeongSellingPrice> _sellingList, List<PyeongLeasePrice> _leaseList) {

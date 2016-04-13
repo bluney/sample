@@ -57,6 +57,16 @@ function calcurateRateOfEarning(){
 	});		
 }
 
+function processBestCase() {
+	$.ajax({
+		type : "GET",
+		url : "/service/market/processBestCase",
+		success : function (response) {
+			//$("#level" + updateLevel + "Selector").html(response);
+		}
+	});	
+}
+
 function ApplyTable(table){
 	table.dataTable( {
 		"aaSorting": [[ 0, "asc" ]],
