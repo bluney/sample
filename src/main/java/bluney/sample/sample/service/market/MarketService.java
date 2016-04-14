@@ -81,32 +81,44 @@ public class MarketService {
 
 	public void analyzeMarketTimeSeries() {
 
+		logger.debug("call analyzeMarketTimeSeries");
+		
 		//평당 매매 가격 분석
+		logger.debug("begin analyze: pyeong selling price");
 		AnalyzeMarket<SellingPriceEntity, SellingRateEntity, PyeongSellingPrice> analyzeSelling = 
 				new AnalyzeMarket<SellingPriceEntity, SellingRateEntity, PyeongSellingPrice>(sellingPriceRepository, sellingRateRepository, PyeongSellingPrice.class);
 		
 		List<PyeongSellingPrice> sellingList = analyzeSelling.analyze();
-
+		logger.debug("end analyze: pyeong selling price. sellingList.size()=" + sellingList.size());
+		
 		//평당 전세 가격 분석
+		logger.debug("begin analyze: pyeong lease price");
 		AnalyzeMarket<LeasePriceEntity, LeaseRateEntity, PyeongLeasePrice> analyzeLease = 
 				new AnalyzeMarket<LeasePriceEntity, LeaseRateEntity, PyeongLeasePrice>(leasePriceRepository, leaseRateRepository, PyeongLeasePrice.class);
 		
 		List<PyeongLeasePrice> leaseList = analyzeLease.analyze();
+		logger.debug("end analyze: pyeong lease price. leaseList.size()=" + leaseList.size());
 		
 		//전세율(전세/매매) 분석
+		logger.debug("begin analyze: leasePerPricee");
 		List<LeasePerPrice> leasePerPriceList = analyzeLeasePerPrice(sellingList, leaseList);
+		logger.debug("end analyze: leasePerPrice. leasePerPriceList.size()=" + leasePerPriceList.size());
 	
 		//지인1
+		logger.debug("begin analyze: gin selling rate");
 		AnalyzeGin<PyeongSellingPrice, MarketGinSelling> analyzeGinSelling = 
 				new AnalyzeGin<PyeongSellingPrice, MarketGinSelling>(sellingList, MarketGinSelling.class);
 		
 		List<MarketGinSelling> ginSellingList = analyzeGinSelling.analyze();
+		logger.debug("end analyze: gin selling rate. ginSellingList.size()=" + ginSellingList.size());
 		
 		//지인2
+		logger.debug("begin analyze: gin lease rate");
 		AnalyzeGin<PyeongLeasePrice, MarketGinLease> analyzeGinLease = 
 				new AnalyzeGin<PyeongLeasePrice, MarketGinLease>(leaseList, MarketGinLease.class);
 		
 		List<MarketGinLease> ginLeaseList = analyzeGinLease.analyze();
+		logger.debug("end analyze: gin lease rate. ginLeaseList.size()=" + ginLeaseList.size());
 		
 		List<TotalMarket> resultList = makeTotalMarketEntities(sellingList, leaseList, leasePerPriceList, ginSellingList, ginLeaseList);
 		totalMarketRepository.deleteAll();
@@ -144,7 +156,7 @@ public class MarketService {
 			for (int i = 1; i < list.size(); i++) {
 				curr = list.get(i);
 
-				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
+				// 예외조건. 신호가 온 이후 26주간은 무시
 				long interval = curr.getDate().getTime() - prev.getDate().getTime();
 
 				if (interval > MILESECONDS_OF_ONE_WEEK * 26) {
@@ -333,7 +345,9 @@ public class MarketService {
 		
 		List<EarningStat> lists = new ArrayList<EarningStat>(); 
 		List<TotalMarket> totalMarketList = new ArrayList<TotalMarket>(listAll);
-		
+		List<TotalMarket> prevMarketListStep1, prevMarketListStep2, prevMarketListStep3;
+
+		prevMarketListStep1 = null;
 		for(double rate=(double) 60.0; rate<=80.0; rate+=1.0) {
 			logger.debug("processBestCase: rate="+rate+", selling=NOT_DEFINE, lease=NOT_DEFINE");
 			
@@ -341,18 +355,27 @@ public class MarketService {
 			if(marketListStep1.size() == 0) {
 				break;
 			}
+			if(prevMarketListStep1 != null && marketListStep1.equals(prevMarketListStep1)) {
+				continue;
+			}
 
 			EarningStat earningStatRate = new EarningStat();
 			earningStatRate.setRate(rate);
 			earningStatRate.setTotalMarketList(marketListStep1);
 			lists.add(earningStatRate);
+
+			prevMarketListStep1 = marketListStep1;
 			
+			prevMarketListStep2 = null;
 			for(double selling = 3.0; selling<=7.0; selling+=0.1) {
 				logger.debug("processBestCase: rate="+rate+", selling="+selling+", lease=NOT_DEFINE");
 				
 				List<TotalMarket> marketListStep2 = getMarketList(marketListStep1, 0.0, selling, 0.0);
 				if(marketListStep2.size() == 0) {
 					break;
+				}
+				if(prevMarketListStep2 != null && marketListStep2.equals(prevMarketListStep2)) {
+					continue;
 				}
 				
 				EarningStat earningStatSelling = new EarningStat();
@@ -361,12 +384,18 @@ public class MarketService {
 				earningStatSelling.setTotalMarketList(marketListStep2);
 				lists.add(earningStatSelling);
 				
+				prevMarketListStep2 = marketListStep2;
+				
+				prevMarketListStep3 = null;
 				for(double lease = 3.0; lease<=7.0; lease+=0.1) {
 					logger.debug("processBestCase: rate="+rate+", selling="+selling+", lease="+lease);
 					
 					List<TotalMarket> marketListStep3 = getMarketList(marketListStep2, 0.0, 0.0, lease);
 					if(marketListStep3.size() == 0) {
 						break;
+					}
+					if(prevMarketListStep3 != null && marketListStep3.equals(prevMarketListStep3)) {
+						continue;
 					}
 					
 					EarningStat earningStatLease = new EarningStat();
@@ -375,11 +404,14 @@ public class MarketService {
 					earningStatLease.setLease(lease);
 					earningStatLease.setTotalMarketList(marketListStep3);
 					lists.add(earningStatLease);
+					
+					prevMarketListStep3 = marketListStep3;
 				}
 			}
 		}
 
 
+		prevMarketListStep1 = null;
 		for(double selling = 3.0; selling<=7.0; selling+=0.1) {
 			logger.debug("processBestCase: rate=NOT_DEFINE, selling="+selling+", lease=NOT_DEFINE");
 			
@@ -387,12 +419,18 @@ public class MarketService {
 			if(marketListStep1.size() == 0) {
 				break;
 			}
-
+			if(prevMarketListStep1 != null && marketListStep1.equals(prevMarketListStep1)) {
+				continue;
+			}
+			
 			EarningStat earningStatSelling = new EarningStat();
 			earningStatSelling.setSelling(selling);
 			earningStatSelling.setTotalMarketList(marketListStep1);
 			lists.add(earningStatSelling);
 			
+			prevMarketListStep1 = marketListStep1;
+			
+			prevMarketListStep2 = null;
 			for(double lease = 3.0; lease<=7.0; lease+=0.1) {
 				logger.debug("processBestCase: rate=NOT_DEFINE, selling="+selling+", lease="+lease);
 				
@@ -400,15 +438,21 @@ public class MarketService {
 				if(marketListStep2.size() == 0) {
 					break;
 				}
+				if(prevMarketListStep2 != null && marketListStep2.equals(prevMarketListStep2)) {
+					continue;
+				}
 				
 				EarningStat earningStatLease = new EarningStat();
 				earningStatLease.setSelling(selling);
 				earningStatLease.setLease(lease);
 				earningStatLease.setTotalMarketList(marketListStep2);
 				lists.add(earningStatLease);
+
+				prevMarketListStep2 = marketListStep2;
 			}
 		}
 		
+		prevMarketListStep1 = null;
 		for(double lease = 3.0; lease<=7.0; lease+=0.1) {
 			logger.debug("processBestCase: rate=NOT_DEFINE, selling=NOT_DEFINE, lease="+lease);
 			
@@ -416,12 +460,18 @@ public class MarketService {
 			if(marketListStep1.size() == 0) {
 				break;
 			}
-
+			if(prevMarketListStep1 != null && marketListStep1.equals(prevMarketListStep1)) {
+				continue;
+			}
+			
 			EarningStat earningStatLease = new EarningStat();
 			earningStatLease.setLease(lease);
 			earningStatLease.setTotalMarketList(marketListStep1);
 			lists.add(earningStatLease);
 			
+			prevMarketListStep1 = marketListStep1;
+			
+			prevMarketListStep2 = null;
 			for(double rate=(double) 60.0; rate<=80.0; rate+=1.0) {
 				logger.debug("processBestCase: rate="+rate+", selling=NOT_DEFINE, lease="+lease);
 				
@@ -429,32 +479,59 @@ public class MarketService {
 				if(totalMarketList.size() == 0) {
 					break;
 				}
-
+				if(prevMarketListStep2 != null && marketListStep2.equals(prevMarketListStep2)) {
+					continue;
+				}
+				
 				EarningStat earningStatRate = new EarningStat();
 				earningStatRate.setRate(rate);
 				earningStatRate.setLease(lease);
 				earningStatRate.setTotalMarketList(marketListStep2);
 				lists.add(earningStatRate);
+				
+				prevMarketListStep2 = marketListStep2;
 			}
 		}
 		
 		
 		earningStatRepository.deleteAll();
-				
+
 		for (EarningStat earningStat : lists) {
 			logger.debug("processBestCase: getEarningStat - " + earningStat.toString());
 			List<EarningStat> results = getEarningStat(earningStat, mapDateAll);
 			if(results != null) {
-//				earningStatList.addAll(results);
-				List<EarningStatEntity> entityList = convert(results);
-				earningStatRepository.save(entityList);
+				earningStatList.addAll(results);
+//				List<EarningStatEntity> entityList = convert(results);
+//				earningStatRepository.save(entityList);
 			}
 		}	
 		
-//		logger.debug("processBestCase: start to save earningStatRepository");
-//		List<EarningStatEntity> entityList = convert(earningStatList);
-//		earningStatRepository.deleteAll();
-//		earningStatRepository.save(entityList);
+		// 불필요한 정보 삭제
+		Collections.sort(earningStatList);
+		List<EarningStat> filteredList = new ArrayList<EarningStat>();
+		int size = earningStatList.size();
+		EarningStat cur, prev;
+		prev = earningStatList.get(0);
+		filteredList.add(prev);
+		for(int i=1; i<size; i++) {
+			cur = earningStatList.get(i);
+			if(prev.getAveragePerYear() == cur.getAveragePerYear()
+					&& prev.getAverageTotal() == cur.getAverageTotal()) {
+				if(prev.getRate() <= cur.getRate()
+						|| prev.getSelling() <= cur.getSelling()
+						|| prev.getLease() <= cur.getLease()) {
+					continue;
+				}
+			}
+			
+			filteredList.add(cur);
+			prev = cur;
+		}
+		
+		logger.debug("processBestCase: start to save earningStatRepository");
+		List<EarningStatEntity> entityList = convert(filteredList);
+		earningStatRepository.deleteAll();
+		earningStatRepository.save(entityList);
 		logger.debug("processBestCase: end to save earningStatRepository");
 		
 	}

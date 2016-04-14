@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public @NoArgsConstructor @AllArgsConstructor class EarningStat {
+public @NoArgsConstructor @AllArgsConstructor class EarningStat implements Comparable<EarningStat> {
 	
 	private @Getter @Setter double rate;
 	private @Getter @Setter double selling;
@@ -27,5 +27,25 @@ public @NoArgsConstructor @AllArgsConstructor class EarningStat {
 	public String toString() {
 		return "EarningStat [rate=" + rate + ", selling=" + selling + ", lease=" + lease + ", interval=" + interval 
 				 + ", numOfIncrease=" + numOfIncrease + ", numOfDecrease=" + numOfDecrease + ", averageTotal=" + averageTotal + ", averagePerYear=" + averagePerYear + "]";
+	}
+	
+	@Override
+	public int compareTo(EarningStat o) {
+		if(getAveragePerYear() == o.getAveragePerYear()) {
+			if(getAverageTotal() == o.getAverageTotal()) {
+				if(getRate() == o.getRate()) {
+					if(getSelling() == o.getSelling()) {
+						if(getLease() == o.getLease()) {
+							return 0;
+						}
+						return getLease() > o.getLease() ? 1 : -1;
+					}
+					return getSelling() > o.getSelling() ? 1 : -1;
+				}
+				return getRate() > o.getRate() ? 1 : -1;
+			}
+			return getAverageTotal() > o.getAverageTotal() ? 1 : -1;
+		}
+		return getAveragePerYear() > o.getAveragePerYear() ? 1 : -1;
 	}
 }

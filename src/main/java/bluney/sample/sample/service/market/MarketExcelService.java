@@ -84,6 +84,7 @@ public class MarketExcelService extends AbstractExcelService {
 
 	private <T extends Market> boolean importMarketExcel(CommonsMultipartFile file, MarketType type,
 			EntityRepository<T, Integer> repository) {
+		logger.debug("importMarketExcel: begin - type:" + type.toString());
 		List<List<String>> sheet;
 		try {
 			sheet = parseExcelFile(file, type.getCode(), getStartRow(), getStartColumn(), LAST_ROW_IN_EXCEL_FILE,
@@ -95,8 +96,10 @@ public class MarketExcelService extends AbstractExcelService {
 		List<T> entities = parseMarketExcelSheet(sheet, type);
 
 		repository.deleteAll();
+		logger.debug("importMarketExcel: begin to save db - type=" + type.toString() + ", entities.size()=" + entities.size());
 		repository.save(entities);
-
+		logger.debug("importMarketExcel: success to save db - type=" + type.toString() + ", entities.size()=" + entities.size());
+		
 		return true;
 	}
 
