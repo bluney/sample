@@ -6,6 +6,7 @@
 		"aaSorting": [[ 0, "asc" ]],
 		"sDom": "<'row view-filter'<'col-sm-12'<'pull-left'i><'pull-right'f><'clearfix'>>>rt<'row view-pager'<'col-sm-12'<'text-left'p>>>",
 		"sPaginationType": "bootstrap",
+		"iDisplayLength": 100,
 		"oLanguage": {
 			"sSearch": "",
 			"sLengthMenu": '_MENU_',

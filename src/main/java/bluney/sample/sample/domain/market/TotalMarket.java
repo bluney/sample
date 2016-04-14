@@ -19,7 +19,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Springfield(strategy=Strategy.HIBERNATE)
+@Springfield(strategy=Strategy.HIBERNATE,
+		methodLevelMapping={ "*", "*.xls"}
+)
 @Entity
 @Table(name="total_market")
 public @ToString @NoArgsConstructor @AllArgsConstructor class TotalMarket extends Market {
