@@ -18,14 +18,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Springfield(strategy=Strategy.HIBERNATE)
-@Entity
-@Table(name="market_gin_lease")
+//@Springfield(strategy=Strategy.HIBERNATE)
 public @ToString @NoArgsConstructor @AllArgsConstructor class MarketGinLease extends MarketGin {
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_MARKET_GIN_LEASE_PK_SYNC")
-	@SequenceGenerator(name="SEQ_MARKET_GIN_LEASE_PK_SYNC", sequenceName="SEQ_MARKET_GIN_LEASE_PK_SYNC")
-	private @Getter @Setter Integer id;				//순번 시퀀스
+//	@Id
+//	@GeneratedValue(strategy=GenerationType.AUTO, generator="SEQ_MARKET_GIN_LEASE_PK_SYNC")
+//	@SequenceGenerator(name="SEQ_MARKET_GIN_LEASE_PK_SYNC", sequenceName="SEQ_MARKET_GIN_LEASE_PK_SYNC")
+//	private @Getter @Setter Integer id;				//순번 시퀀스
 	
 	private @Getter @Setter String code;			//법정동 코드 
 	private @Getter @Setter @NotNull String classification;	//행정구역 식별자

@@ -28,7 +28,7 @@ import bluney.sample.sample.common.util.DateUtil;
 import bluney.sample.sample.customtype.market.Market;
 import bluney.sample.sample.domain.lease.PyeongLeasePrice;
 import bluney.sample.sample.domain.market.TotalMarket;
-import bluney.sample.sample.domain.market.earning.stat.EarningStat;
+import bluney.sample.sample.domain.market.earning.EarningStat;
 import bluney.sample.sample.domain.market.gin.lease.MarketGinSelling;
 import bluney.sample.sample.domain.market.gin.selling.MarketGinLease;
 import bluney.sample.sample.domain.market.rate.LeasePerPrice;
@@ -60,8 +60,8 @@ public class MarketController {
 	@Resource(name="totalMarketService")
 	private EntityService<TotalMarket, TotalMarketQuery> totalMarketService;
 
-	@Autowired @Qualifier("earningStatRepository")
-	private EntityRepository<EarningStat, Integer> earningStatRepository;
+//	@Autowired @Qualifier("earningStatRepository")
+//	private EntityRepository<EarningStat, Integer> earningStatRepository;
 	
 	@RequestMapping(value = "/market.html", method = RequestMethod.GET)
 	public String sampleMarket(@RequestParam HashMap<String, String> map, Model model) {
@@ -74,69 +74,66 @@ public class MarketController {
 		
 		@SuppressWarnings("unchecked")
 		Iterable<TotalMarket> marketList = (Iterable<TotalMarket>) totalMarketService.find(query, null);
-		model.addAttribute(MARKET_ENTITY, marketList);
+		if(marketList.iterator().hasNext()) {
 
-		List<PyeongSellingPrice> pyeongSellingList = new ArrayList<PyeongSellingPrice>();
-		List<PyeongLeasePrice> pyeongLeaseList = new ArrayList<PyeongLeasePrice>();
-		List<LeasePerPrice> leasePerPriceList = new ArrayList<LeasePerPrice>();
-		List<MarketGinSelling> marketGinSellingList = new ArrayList<MarketGinSelling>();
-		List<MarketGinLease> marketGinLeaseList = new ArrayList<MarketGinLease>();
-		List<Date> dateList = new ArrayList<Date>();
-		
-		for(TotalMarket entity : marketList) {
-			if(entity.getSellingPrice() != null) {
-				PyeongSellingPrice item = new PyeongSellingPrice();
-				item.setMarket(entity);
-				item.setValue(entity.getSellingPrice());
-				pyeongSellingList.add(item);				
-			}
-			if(entity.getLeasePrice() != null) {
-				PyeongLeasePrice item = new PyeongLeasePrice();
-				item.setMarket(entity);
-				item.setValue(entity.getLeasePrice());
-				pyeongLeaseList.add(item);				
-			}
-			if(entity.getGinRate() != null) {
-				LeasePerPrice item = new LeasePerPrice();
-				item.setMarket(entity);
-				item.setValue(entity.getGinRate());
-				leasePerPriceList.add(item);
-			}
-			if(entity.getGinSelling() != null) {
-				MarketGinSelling item = new MarketGinSelling();
-				item.setMarket(entity);
-				item.setValue(entity.getGinSelling());
-				marketGinSellingList.add(item);
-			}
-			if(entity.getGinLease() != null) {
-				MarketGinLease item = new MarketGinLease();
-				item.setMarket(entity);
-				item.setValue(entity.getGinLease());
-				marketGinLeaseList.add(item);
+			model.addAttribute(MARKET_ENTITY, marketList);
+
+			List<PyeongSellingPrice> pyeongSellingList = new ArrayList<PyeongSellingPrice>();
+			List<PyeongLeasePrice> pyeongLeaseList = new ArrayList<PyeongLeasePrice>();
+			List<LeasePerPrice> leasePerPriceList = new ArrayList<LeasePerPrice>();
+			List<MarketGinSelling> marketGinSellingList = new ArrayList<MarketGinSelling>();
+			List<MarketGinLease> marketGinLeaseList = new ArrayList<MarketGinLease>();
+			List<Date> dateList = new ArrayList<Date>();
+			
+			for(TotalMarket entity : marketList) {
+				if(entity.getSellingPrice() != null) {
+					PyeongSellingPrice item = new PyeongSellingPrice();
+					item.setMarket(entity);
+					item.setValue(entity.getSellingPrice());
+					pyeongSellingList.add(item);				
+				}
+				if(entity.getLeasePrice() != null) {
+					PyeongLeasePrice item = new PyeongLeasePrice();
+					item.setMarket(entity);
+					item.setValue(entity.getLeasePrice());
+					pyeongLeaseList.add(item);				
+				}
+				if(entity.getGinRate() != null) {
+					LeasePerPrice item = new LeasePerPrice();
+					item.setMarket(entity);
+					item.setValue(entity.getGinRate());
+					leasePerPriceList.add(item);
+				}
+				if(entity.getGinSelling() != null) {
+					MarketGinSelling item = new MarketGinSelling();
+					item.setMarket(entity);
+					item.setValue(entity.getGinSelling());
+					marketGinSellingList.add(item);
+				}
+				if(entity.getGinLease() != null) {
+					MarketGinLease item = new MarketGinLease();
+					item.setMarket(entity);
+					item.setValue(entity.getGinLease());
+					marketGinLeaseList.add(item);
+				}
+				
+				dateList.add(entity.getDate());
 			}
 			
-			dateList.add(entity.getDate());
+			Collections.sort(pyeongSellingList, Market.getValueSorter());
+			Collections.sort(pyeongLeaseList, Market.getValueSorter());
+			Collections.sort(leasePerPriceList, Market.getValueSorter());
+			Collections.sort(marketGinSellingList, Market.getValueSorter());
+			Collections.sort(marketGinLeaseList, Market.getValueSorter());
+			Collections.sort(dateList, Collections.reverseOrder());
+			
+			model.addAttribute(PYEONG_SELLING_PRICE_ENTITY, pyeongSellingList);
+			model.addAttribute(PYEONG_LEASE_PRICE_ENTITY, pyeongLeaseList);
+			model.addAttribute(LEASE_PER_SELLING_ENTITY, leasePerPriceList);
+			model.addAttribute(MARKET_GIN_SELLING_ENTITY, marketGinSellingList);
+			model.addAttribute(MARKET_GIN_LEASE_ENTITY, marketGinLeaseList);
+			model.addAttribute(DATES_ENTITY_FOR_MARKET, dateList);
 		}
-		
-		Collections.sort(pyeongSellingList, Market.getValueSorter());
-		Collections.sort(pyeongLeaseList, Market.getValueSorter());
-		Collections.sort(leasePerPriceList, Market.getValueSorter());
-		Collections.sort(marketGinSellingList, Market.getValueSorter());
-		Collections.sort(marketGinLeaseList, Market.getValueSorter());
-		Collections.sort(dateList, Collections.reverseOrder());
-		
-//		Iterable<?> pyeongSellingList = pyeongSellingPriceService.find(query, null);
-//		Iterable<?> pyeongLeaseList = pyeongLeasePriceService.find(query, null);
-//		Iterable<?> leasePerPriceList = leasePerPriceService.find(query, null);
-//		Iterable<?> marketGinSellingList = marketGinSellingService.find(query, null);
-//		Iterable<?> marketGinLeaseList = marketGinLeaseService.find(query, null);
-//		
-		model.addAttribute(PYEONG_SELLING_PRICE_ENTITY, pyeongSellingList);
-		model.addAttribute(PYEONG_LEASE_PRICE_ENTITY, pyeongLeaseList);
-		model.addAttribute(LEASE_PER_SELLING_ENTITY, leasePerPriceList);
-		model.addAttribute(MARKET_GIN_SELLING_ENTITY, marketGinSellingList);
-		model.addAttribute(MARKET_GIN_LEASE_ENTITY, marketGinLeaseList);
-		model.addAttribute(DATES_ENTITY_FOR_MARKET, dateList);
 		
 		return "/service/market/market.html";
 	}
@@ -162,29 +159,6 @@ public class MarketController {
 		
 		logger.debug("calcurateRateOfEarning: CONDITION - rate=" + pRate + ", selling=" + pSelling + ", lease=" + pLease);
 		logger.debug("calcurateRateOfEarning:           - timing=" + pTiming);
-//		List<LeasePerPrice> leasePerPriceList = null;
-//		List<MarketGinSelling> marketGinSellingList = null;
-//		List<MarketGinLease> marketGinLeaseList  = null;
-//		
-//		if(pRate != null) {
-//			MarketRankQuery query = new MarketRankQuery();
-//			query.setValue(pRate);
-//			leasePerPriceList = (List<LeasePerPrice>) leasePerPriceService.find(query, null);	
-//		}
-//		
-//		if(pSelling != null) {
-//			MarketRankQuery query = new MarketRankQuery();
-//			query.setValue(pSelling);
-//			marketGinSellingList = (List<MarketGinSelling>) marketGinSellingService.find(query, null);
-//		}
-//		
-//		if(pSelling != null) {
-//			MarketRankQuery query = new MarketRankQuery();
-//			query.setValue(pLease);
-//			marketGinLeaseList = (List<MarketGinLease>) marketGinLeaseService.find(query, null);
-//		}
-//		
-//		Iterable<?> resultList = service.calcurateRateOfEarning(leasePerPriceList, marketGinSellingList, marketGinLeaseList);
 		
 		TotalMarketQuery query = new TotalMarketQuery();
 		query.setGinRate(pRate);
@@ -193,6 +167,7 @@ public class MarketController {
 		
 		List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
 		List<TotalMarket> resultList = service.calcurateRateOfEarning(totalMarketList, pTiming);
+
 		Collections.sort(resultList, Market.getValueSorter());
 		Double average = 0.0;
 		int numOfIncrease = 0;
@@ -223,151 +198,151 @@ public class MarketController {
 	public String processBestCase(@RequestParam HashMap<String, String> map, Model model) {
 		
 		logger.debug("processBestCase");
-		//service.processBestCase();
+		service.processBestCase();
 		
-		int timing = 104;
-		List<EarningStat> earningStatList = new ArrayList<EarningStat>();
-		Map<String, Map<Date, TotalMarket>> mapDateAll = service.getMapDateAll();
-		
-		for(int i=26; i<27; i++) {
-			for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
-				TotalMarketQuery query = new TotalMarketQuery();
-				query.setGinRate(rate);
-				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
-				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
-				
-				if(earningStat.getTotalMarketList().size() > 0) {
-					earningStat.setRate(rate);
-					earningStatList.add(earningStat);
-					
-					for(double selling = 2.0; selling<7.0; selling+=0.1) {
-						query.setGinSelling(selling);
-						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
-						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
-						
-						if(stat.getTotalMarketList().size() > 0) {
-							stat.setRate(rate);
-							stat.setSelling(selling);
-							earningStatList.add(stat);		
-							
-							for(double lease = 2.0; lease<7.0; lease+=0.1) {
-								query.setGinSelling(lease);
-								List<TotalMarket> allConditionList = (List<TotalMarket>) totalMarketService.find(query, null);
-								EarningStat result = getEarningStat(allConditionList, timing, mapDateAll);
-								
-								if(result.getTotalMarketList().size() > 0) {
-									result.setRate(rate);
-									result.setSelling(selling);
-									result.setLease(lease);
-									earningStatList.add(result);					
-								} else {
-									break;
-								}
-							}
-						} else {
-							break;
-						}
-					}
-				} else {
-					break;
-				}
-			}
-
-			for(double selling = 2.0; selling<7.0; selling+=0.1) {
-				TotalMarketQuery query = new TotalMarketQuery();
-				query.setGinSelling(selling);
-				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
-				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
-				
-				if(earningStat.getTotalMarketList().size() > 0) {
-					earningStat.setSelling(selling);
-					earningStatList.add(earningStat);	
-					
-					for(double lease = 2.0; lease<7.0; lease+=0.1) {
-						//TotalMarketQuery query = new TotalMarketQuery();
-						query.setGinSelling(lease);
-						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
-						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
-						
-						if(stat.getTotalMarketList().size() > 0) {
-							stat.setSelling(selling);
-							stat.setLease(lease);
-							earningStatList.add(stat);					
-						} else {
-							break;
-						}
-					}
-				} else {
-					break;
-				}
-			}
-			
-			for(double lease = 2.0; lease<2.1; lease+=0.1) {
-				TotalMarketQuery query = new TotalMarketQuery();
-				query.setGinSelling(lease);
-				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
-				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
-				
-				if(earningStat.getTotalMarketList().size() > 0) {
-					earningStat.setLease(lease);
-					earningStatList.add(earningStat);	
-					
-					for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
-						//TotalMarketQuery query = new TotalMarketQuery();
-						query.setGinRate(rate);
-						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
-						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
-						
-						if(stat.getTotalMarketList().size() > 0) {
-							stat.setLease(lease);
-							stat.setRate(rate);
-							earningStatList.add(stat);	
-						} else {
-							break;
-						}
-					}
-				} else {
-					break;
-				}
-			}
-		}
-		
-		earningStatRepository.deleteAll();
-		earningStatRepository.save(earningStatList);
+//		int timing = 104;
+//		List<EarningStat> earningStatList = new ArrayList<EarningStat>();
+//		Map<String, Map<Date, TotalMarket>> mapDateAll = service.getMapDateAll();
+//		
+//		for(int i=26; i<27; i++) {
+//			for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
+//				TotalMarketQuery query = new TotalMarketQuery();
+//				query.setGinRate(rate);
+//				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+//				
+//				if(earningStat.getTotalMarketList().size() > 0) {
+//					earningStat.setRate(rate);
+//					earningStatList.add(earningStat);
+//					
+//					for(double selling = 2.0; selling<7.0; selling+=0.1) {
+//						query.setGinSelling(selling);
+//						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+//						
+//						if(stat.getTotalMarketList().size() > 0) {
+//							stat.setRate(rate);
+//							stat.setSelling(selling);
+//							earningStatList.add(stat);		
+//							
+//							for(double lease = 2.0; lease<7.0; lease+=0.1) {
+//								query.setGinSelling(lease);
+//								List<TotalMarket> allConditionList = (List<TotalMarket>) totalMarketService.find(query, null);
+//								EarningStat result = getEarningStat(allConditionList, timing, mapDateAll);
+//								
+//								if(result.getTotalMarketList().size() > 0) {
+//									result.setRate(rate);
+//									result.setSelling(selling);
+//									result.setLease(lease);
+//									earningStatList.add(result);					
+//								} else {
+//									break;
+//								}
+//							}
+//						} else {
+//							break;
+//						}
+//					}
+//				} else {
+//					break;
+//				}
+//			}
+//
+//			for(double selling = 2.0; selling<7.0; selling+=0.1) {
+//				TotalMarketQuery query = new TotalMarketQuery();
+//				query.setGinSelling(selling);
+//				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+//				
+//				if(earningStat.getTotalMarketList().size() > 0) {
+//					earningStat.setSelling(selling);
+//					earningStatList.add(earningStat);	
+//					
+//					for(double lease = 2.0; lease<7.0; lease+=0.1) {
+//						//TotalMarketQuery query = new TotalMarketQuery();
+//						query.setGinSelling(lease);
+//						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+//						
+//						if(stat.getTotalMarketList().size() > 0) {
+//							stat.setSelling(selling);
+//							stat.setLease(lease);
+//							earningStatList.add(stat);					
+//						} else {
+//							break;
+//						}
+//					}
+//				} else {
+//					break;
+//				}
+//			}
+//			
+//			for(double lease = 2.0; lease<2.1; lease+=0.1) {
+//				TotalMarketQuery query = new TotalMarketQuery();
+//				query.setGinSelling(lease);
+//				List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//				EarningStat earningStat = getEarningStat(totalMarketList, timing, mapDateAll);
+//				
+//				if(earningStat.getTotalMarketList().size() > 0) {
+//					earningStat.setLease(lease);
+//					earningStatList.add(earningStat);	
+//					
+//					for(double rate=(double) 60.0; rate<80.0; rate+=0.1) {
+//						//TotalMarketQuery query = new TotalMarketQuery();
+//						query.setGinRate(rate);
+//						List<TotalMarket> marketList = (List<TotalMarket>) totalMarketService.find(query, null);
+//						EarningStat stat = getEarningStat(marketList, timing, mapDateAll);
+//						
+//						if(stat.getTotalMarketList().size() > 0) {
+//							stat.setLease(lease);
+//							stat.setRate(rate);
+//							earningStatList.add(stat);	
+//						} else {
+//							break;
+//						}
+//					}
+//				} else {
+//					break;
+//				}
+//			}
+//		}
+//		
+//		earningStatRepository.deleteAll();
+//		earningStatRepository.save(earningStatList);
 		
 		return "";
 	}
 
-	private EarningStat getEarningStat(List<TotalMarket> totalMarketList, int sellingTiming, Map<String, Map<Date, TotalMarket>> mapDateAll) {
-		EarningStat earningStat = new EarningStat();
-		
-		List<TotalMarket> resultList = service.stasticEarningRate(totalMarketList, sellingTiming, mapDateAll);
-		Collections.sort(resultList, Market.getValueSorter());
-		Double averageTotal = 0.0;
-		int numOfIncrease = 0;
-		int numOfDecrease = 0;
-		for (TotalMarket item : resultList) {
-			Double value = item.getValue(); 
-			averageTotal += value;
-			if (value > 0.0) {
-				numOfIncrease++;
-			}else if (value < 0.0) {
-				numOfDecrease++;
-			}
-		}
-		
-		averageTotal /= (double) resultList.size();
-		Double averagePerYear = averageTotal / ((double)sellingTiming / (365.0/7.0));
-
-		earningStat.setNumOfIncrease(numOfIncrease);
-		earningStat.setNumOfDecrease(numOfDecrease);
-		earningStat.setAverageTotal(averageTotal);
-		earningStat.setAveragePerYear(averagePerYear);
-		earningStat.setTotalMarketList(resultList);
-		
-		earningStat.setInterval(sellingTiming);
-		
-		return earningStat;
-	}
+//	private EarningStat getEarningStat(List<TotalMarket> totalMarketList, int sellingTiming, Map<String, Map<Date, TotalMarket>> mapDateAll) {
+//		EarningStat earningStat = new EarningStat();
+//		
+//		List<TotalMarket> resultList = service.stasticEarningRate(totalMarketList, sellingTiming, mapDateAll);
+//		Collections.sort(resultList, Market.getValueSorter());
+//		Double averageTotal = 0.0;
+//		int numOfIncrease = 0;
+//		int numOfDecrease = 0;
+//		for (TotalMarket item : resultList) {
+//			Double value = item.getValue(); 
+//			averageTotal += value;
+//			if (value > 0.0) {
+//				numOfIncrease++;
+//			}else if (value < 0.0) {
+//				numOfDecrease++;
+//			}
+//		}
+//		
+//		averageTotal /= (double) resultList.size();
+//		Double averagePerYear = averageTotal / ((double)sellingTiming / (365.0/7.0));
+//
+//		earningStat.setNumOfIncrease(numOfIncrease);
+//		earningStat.setNumOfDecrease(numOfDecrease);
+//		earningStat.setAverageTotal(averageTotal);
+//		earningStat.setAveragePerYear(averagePerYear);
+//		earningStat.setTotalMarketList(resultList);
+//		
+//		earningStat.setInterval(sellingTiming);
+//		
+//		return earningStat;
+//	}
 	
 }

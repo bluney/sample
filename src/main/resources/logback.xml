@@ -8,7 +8,7 @@
 	</appender>
 
 	<logger name="org.thymeleaf" level="OFF" />
-	<logger name="org.hibernate.SQL" level="DEBUG" />
+	<logger name="org.hibernate.SQL" level="OFF" />
 	<logger name="org.mybatis" level="OFF" />
 	<logger name="org.apache.tiles" level="OFF" />
 	<logger name="org.springframework" level="OFF" /> 
