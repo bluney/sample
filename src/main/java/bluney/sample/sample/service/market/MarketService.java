@@ -115,48 +115,10 @@ public class MarketService {
 	}
 
 	public List<TotalMarket> calcurateRateOfEarning(final List<TotalMarket> _list, int sellTiming) {
-		List<TotalMarket> listResult = new ArrayList<TotalMarket>();
 		
-		// 추출된 결과에서 불필요한 정보를 제거하자
-		Map<String, List<TotalMarket>> mapTarget = new HashMap<String, List<TotalMarket>>();
 		Map<String, List<TotalMarket>> mapInput = groupByClassificationMap(_list);
-
-		for (Entry<String, List<TotalMarket>> cls : mapInput.entrySet()) {
-			List<TotalMarket> listTarget = new ArrayList<TotalMarket>();
-			List<TotalMarket> list = cls.getValue();
-			Collections.sort(list);
-
-			TotalMarket curr = null;
-			TotalMarket prev = list.get(0);
-			for (int i = 1; i < list.size(); i++) {
-				curr = list.get(i);
-				// 예외조건. 신호가 온 이후 연속해서 신호가 올 경우는 넣지 말자
-				long interval = curr.getDate().getTime() - prev.getDate().getTime();
-
-				if (interval > MILESECONDS_OF_ONE_WEEK * 26) {
-					listTarget.add(curr);
-					prev = curr;
-				}
-			}
-
-			mapTarget.put(cls.getKey(), listTarget);
-		}
-
 		Map<String, Map<Date, TotalMarket>> mapDateAll = getMapDateAll();
-		
-		// 수익률 계산
-		for (Entry<String, List<TotalMarket>> cls : mapTarget.entrySet()) {
-			List<TotalMarket> list = cls.getValue();
-			Map<Date, TotalMarket> mapSearch = mapDateAll.get(cls.getKey());
-			for (TotalMarket item : list) {
-				Date date = new Date(item.getDate().getTime() + (long)(sellTiming*MILESECONDS_OF_ONE_WEEK));
-				TotalMarket toItem = mapSearch.get(date);
-				if(toItem != null) {
-					item.setValue( (toItem.getSellingPrice()-item.getSellingPrice()) / item.getSellingPrice());
-					listResult.add(item);
-				}
-			}
-		}
+		List<TotalMarket> listResult = stasticEarningRate(mapInput, sellTiming, mapDateAll);
 
 		return listResult;
 	}
