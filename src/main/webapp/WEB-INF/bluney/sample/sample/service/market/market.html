@@ -42,7 +42,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="entity, idx : ${pyeong_selling_price_entity}" >
+						<tr th:each="entity, idx : ${pyeong_selling_price_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
 							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 3, 'POINT')}">13.10</td>
@@ -63,7 +63,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="entity, idx : ${pyeong_lease_price_entity}" >
+						<tr th:each="entity, idx : ${pyeong_lease_price_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
 							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 3, 'POINT')}">13.10</td>
@@ -104,7 +104,7 @@
 					<tfoot style="height:0px;">
 					</tfoot>
 					<tbody>
-						<tr th:each="entity, idx : ${lease_per_selling_entity}" >
+						<tr th:each="entity, idx : ${lease_per_selling_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
 							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 2, 'POINT')}">13.10</td>
@@ -125,7 +125,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="entity, idx : ${market_gin_selling_entity}" >
+						<tr th:each="entity, idx : ${market_gin_selling_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
 							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 2, 'POINT')}">13.10</td>
@@ -146,7 +146,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="entity, idx : ${market_gin_lease_entity}" >
+						<tr th:each="entity, idx : ${market_gin_lease_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 							<td style="text-align: center;" th:text="${idx.count}">1</td>
 							<td style="text-align: center;" th:text="${entity.classification}">1</td>
 							<td style="text-align: center;" th:text="${#numbers.formatDecimal(entity.value, 0, 2, 'POINT')}">13.10</td>

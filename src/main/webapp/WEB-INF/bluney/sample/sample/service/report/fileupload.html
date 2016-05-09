@@ -1,0 +1,13 @@
+<link type="text/css" rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.min.css" media="screen" />
+<link type="text/css" rel="stylesheet" th:href="@{/resources/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css}" media="screen" />
+<script th:src="@{/resources/js/EgovMultiFile.js}"></script>
+
+<form:form commandName="board" name="board" method="post" enctype="multipart/form-data" >
+<label>test</label>
+	<input name="file_1" id="egovComFileUploader" type="file" />
+	<div id="egovComFileList"></div>
+</form:form>
+<script type="text/javascript">
+	var multi_selector = new MultiSelector(document.getElementById('egovComFileList'), 10);
+	multi_selector.addElement(document.getElementById('egovComFileUploader'));
+</script>

@@ -12,9 +12,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-@QueryMethod("findByDateAndGinSellingGreaterThanEqualAndGinLeaseGreaterThanEqualAndGinRateGreaterThanEqualOrderByClassificationAscDateDesc")
+@QueryMethod("findByDateAndClassificationAndGinSellingGreaterThanEqualAndGinLeaseGreaterThanEqualAndGinRateGreaterThanEqualOrderByClassificationAscDateDesc")
 public @ToString @NoArgsConstructor @AllArgsConstructor class TotalMarketQuery {
 	private @Getter @Setter @NotNull java.util.Date date;	//날짜
+	private @Getter @Setter @NotNull String classification;	//행정구역 식별자
 	
 	@Column(name="selling_price")
 	private @Getter @Setter Double sellingPrice;

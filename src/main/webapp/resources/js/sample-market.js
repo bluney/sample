@@ -118,6 +118,11 @@ $.widget( "ui.weekspinner", $.ui.spinner, {
 });
 
 
+function ondblclickForClassfication(classification) {
+	var url = "/service/market/readClassification.html?classification=" + classification;
+	LoadAjaxContent(url);	
+}
+
 $(document).ready(function() {
 	// Load Datatables and run plugin on tables 
 	LoadDataTablesScripts(AllTables);

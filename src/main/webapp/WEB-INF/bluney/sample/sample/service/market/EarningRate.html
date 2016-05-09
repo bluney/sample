@@ -24,7 +24,7 @@
 	<tfoot style="height:0px;">
 	</tfoot>
 	<tbody>
-		<tr th:each="entity, idx : ${earning_rate_entity}" >
+		<tr th:each="entity, idx : ${earning_rate_entity}" th:ondblclick="'ondblclickForClassfication(\''+${entity.classification}+'\');'">
 			<td style="text-align: center;" th:text="${idx.count}">1</td>
 			<td style="text-align: center;" th:text="${entity.classification}">1</td>
 			<td style="text-align: center;" th:text="${#dates.format(entity.date, 'yyyy-MM-dd')}">1</td>

@@ -5,14 +5,14 @@
 	<navigation pattern="/service/market/**" path="/service/market/market.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="시장동향">
 	</navigation>
 
-<!--
-	<navigation pattern="/service/apt/**" path="/service/apt/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="맞춤아파트">
-	
+
+	<navigation pattern="/service/fileUpload/**" path="/service/fileUpload" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="맞춤아파트">
 	</navigation>
 	
-	<navigation pattern="/service/report/**" path="/service/report/new.html" hide="false" accessible="true" access="hasRole('ROLE_USER')" name="현장리포트">
-	
+	<navigation pattern="/service/report/**" path="/service/report" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="현장리포트">
 	</navigation>
+
+<!--	
 
 	<navigation pattern="/service/notice/**" path="/service/bigdata/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="알림마당">
 	

@@ -9,6 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.persistence.Column;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.u2ware.springfield.repository.EntityRepository;
+import com.u2ware.springfield.repository.QueryMethod;
 import com.u2ware.springfield.service.EntityService;
 
 import bluney.sample.sample.common.util.DataConvertUtil;
@@ -36,7 +39,11 @@ import bluney.sample.sample.domain.selling.PyeongSellingPrice;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.service.market.MarketService;
 import bluney.sample.sample.service.market.query.TotalMarketQuery;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Controller
 @RequestMapping(value = "/service/market")
@@ -344,5 +351,24 @@ public class MarketController {
 //		
 //		return earningStat;
 //	}
+	
+	@RequestMapping(value = "/readClassification.html", method = RequestMethod.GET)
+	public String readClassification(@RequestParam HashMap<String, String> map, Model model) {
+		String classification = map.get("classification");
+		
+		logger.debug("readClassification: classification=" + classification);
+		
+		TotalMarketQuery query = new TotalMarketQuery();
+		query.setClassification(classification);
+
+		@SuppressWarnings("unchecked")
+		List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+
+		Collections.sort(totalMarketList, Collections.reverseOrder());
+
+		model.addAttribute("total_market_entity", totalMarketList);
+		
+		return "/service/market/readClassification.html";
+	}
 	
 }
