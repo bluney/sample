@@ -1,29 +1,29 @@
 package bluney.sample.sample.controller.market;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.persistence.Column;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.u2ware.springfield.repository.EntityRepository;
-import com.u2ware.springfield.repository.QueryMethod;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.u2ware.springfield.service.EntityService;
 
 import bluney.sample.sample.common.util.DataConvertUtil;
@@ -31,17 +31,13 @@ import bluney.sample.sample.common.util.DateUtil;
 import bluney.sample.sample.customtype.market.Market;
 import bluney.sample.sample.domain.lease.PyeongLeasePrice;
 import bluney.sample.sample.domain.market.TotalMarket;
-import bluney.sample.sample.domain.market.earning.EarningStat;
 import bluney.sample.sample.domain.market.gin.lease.MarketGinSelling;
 import bluney.sample.sample.domain.market.gin.selling.MarketGinLease;
 import bluney.sample.sample.domain.market.rate.LeasePerPrice;
 import bluney.sample.sample.domain.selling.PyeongSellingPrice;
-import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
 import bluney.sample.sample.service.market.MarketService;
 import bluney.sample.sample.service.market.query.TotalMarketQuery;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -367,8 +363,60 @@ public class MarketController {
 		Collections.sort(totalMarketList, Collections.reverseOrder());
 
 		model.addAttribute("total_market_entity", totalMarketList);
-		
+		model.addAttribute("classification", classification);		
 		return "/service/market/readClassification.html";
 	}
 	
+	@RequestMapping(value = "/totalMarket", method = RequestMethod.GET)
+	public void totalMarket(@RequestParam HashMap<String, String> map, Model model, HttpServletResponse response) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		String classification = map.get("classification");
+		String type = map.get("type");
+		
+		logger.debug("totalMarket: classification=" + classification + ", type=" + type);
+		
+		TotalMarketQuery query = new TotalMarketQuery();
+		query.setClassification(classification);
+
+		@SuppressWarnings("unchecked")
+		List<TotalMarket> totalMarketList = (List<TotalMarket>) totalMarketService.find(query, null);
+		Collections.sort(totalMarketList);
+
+		List<TotalMarketJsonForm> jsonList = new ArrayList<TotalMarketJsonForm>();
+		Method method = TotalMarket.class.getMethod("get"+type);
+		String resultJson = "[";
+		for(TotalMarket market : totalMarketList) {
+			if(resultJson.length()>4) {
+				resultJson += ",";
+			}
+			TotalMarketJsonForm json = new TotalMarketJsonForm();
+			json.setDate(market.getDate());
+			json.setValue((Double) method.invoke(market));
+			
+			jsonList.add(json);
+			if(json.getValue() != null)
+				resultJson += json.toJson();
+		}
+		resultJson += "]";
+		
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			response.getWriter().print(resultJson);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		return "/service/market/totalMarket.json";
+	}
+	
+	@ToString class TotalMarketJsonForm {
+		private @Getter @Setter @NotNull java.util.Date date;	//날짜
+		private @Getter @Setter Double value;
+		public String toJson() {
+			return "["+date.getTime()+","+String.format("%.2f", value)+"]";
+//			return date.getTime()+","+String.format("%.2f", value);
+		}
+	}
 }

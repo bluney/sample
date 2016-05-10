@@ -86,7 +86,9 @@ function ApplyTable(table){
 			"sInfo": " _START_~_END_ of _TOTAL_ entries",
 			"sInfoEmpty": "0 entries",
 			"sInfoFiltered": "(_MAX_ total entries)",
-		}
+		},
+		"bRetrieve" : true,
+		"bDestroy" : true
 	});
 }
 

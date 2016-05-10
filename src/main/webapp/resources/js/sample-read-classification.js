@@ -35,7 +35,7 @@
 
 // Run Datables plugin and create 3 variants of settings
 function AllTables(){
-	ApplyTable($('#divReadClassification'));
+	ApplyTable($('#readClassification'));
 	LoadSelect2Script(MakeSelect2);
 }
 
@@ -46,7 +46,13 @@ function MakeSelect2(){
 	});
 }
 
+function onClickGoToMainPage(){
+	var url = "/service/market/market.html";
+	LoadAjaxContent(url);	
+}
+
 $(document).ready(function() {
 	// Load Datatables and run plugin on tables 
 	LoadDataTablesScripts(AllTables);
+	
 });
