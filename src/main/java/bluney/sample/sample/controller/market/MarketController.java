@@ -415,7 +415,7 @@ public class MarketController {
 		private @Getter @Setter @NotNull java.util.Date date;	//날짜
 		private @Getter @Setter Double value;
 		public String toJson() {
-			return "["+date.getTime()+","+String.format("%.2f", value)+"]";
+			return "["+(date.getTime()+32400000)+","+value+"]";
 //			return date.getTime()+","+String.format("%.2f", value);
 		}
 	}

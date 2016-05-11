@@ -11,17 +11,18 @@
 <div class="row">
 	<div class="col-xs-12">
 		<div class="box">
+			<div class="box-header">
+				<div class="box-name">
+					<span>지역별 상세 정보 : </span>
+					<span th:text="${classification}"></span>
+					<button class="btn pull-right" onclick="onClickGoToMainPage();">돌아가기</button>
+				</div>
+				<div class="no-move"></div>
+			</div>
 			<div id="container" style="width:100%; height:400px;"></div>
 			<div class="col-xs-12 col-sm-12 box-content table-responsive">
 				<table id="readClassification" th:if="${total_market_entity}" class="table display table-striped table-hover table-heading table-datatable">
 					<thead>
-						<tr>
-							<th colspan='8'>
-							<span>지역별 상세 정보 : </span>
-							<span th:text="${classification}"></span>
-							<button class="btn pull-right" onclick="onClickGoToMainPage();">시장동향</button>
-							</th>
-						</tr>
 						<tr>
 							<th style="text-align: center;">순번</th>
 							<th style="text-align: center;">DATE</th>
@@ -72,60 +73,44 @@
 </div>
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css" />
-<script src="https://code.highcharts.com/stock/highstock.js"></script>
-<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-<script th:src="@{/resources/js/sample-read-classification.js}" type="text/javascript"></script>
 <script th:inline="javascript">
 /*<![CDATA[*/
+var classification;
 $(document).ready(function() {
-	var seriesOptions = [],
-    	seriesCounter = 0,
-		names = ['GinRate', 'GinSelling', 'GinLease'],
-		classification = /*[[${classification}]]*/ "";
+	classification = /*[[${classification}]]*/ "";
 	
-	function createChart() {
-        $('#container').highcharts('StockChart', {
-            rangeSelector: {
-                selected: 4
-            },
-            yAxis: {
-                labels: {
-                    formatter: function () {
-                        return (this.value > 0 ? '+' : '-') + this.value + '%';
-                    }
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 2,
-                    color: 'silver'
-                }]
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent'
-                }
-            },
+	var seriesOptions = [],
+	seriesCounter = 0,
+	types = ['GinRate', 'GinSelling', 'GinLease'],
+	names = ['전세가율', '매매증감율', '전세증감율'];
 
-            tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-                valueDecimals: 2
-            },
-
-            series: seriesOptions
-        });
-    }
-
-    $.each(names, function (i, name) {
-    	$.ajax({
-    		url : '/service/market/totalMarket',
-    		data : {'classification' : classification,
-    				'type' : name},
-    		success:  function (response) {
-    			alert(response);
-	            seriesOptions[i] = {
-	                name: name,
-	                data: response
-	            };
+	$.each(names, function (i, name) {
+		$.ajax({
+			url : '/service/market/totalMarket',
+			data : {'classification' : classification,
+					'type' : types[i]},
+			success:  function (response) {
+				if(i==0) {
+					seriesOptions[i] = {
+			                name: name,
+			                data: $.parseJSON(response),
+			                yAxis: 0,
+			                tooltip: {
+			                    valueDecimals: 2
+			                },
+			            };
+					
+				}else {
+					seriesOptions[i] = {
+			                name: name,
+			                data: $.parseJSON(response),
+			                yAxis: 1,
+			                tooltip: {
+			                    valueDecimals: 2
+			                },
+			            };					
+				}
+				
 	
 	            // As we're loading the data asynchronously, we don't know what order it will arrive. So
 	            // we keep a counter and create the chart when all the data is loaded.
@@ -133,9 +118,56 @@ $(document).ready(function() {
 	            if (seriesCounter === names.length) {
 	                createChart();
 	            }
-    		}
-        });
-    });
+			}
+	    });
+	});	
+	
+	function createChart() {
+		
+	    $('#container').highcharts('StockChart', {
+	        rangeSelector : {
+	            selected : 5
+	        },
+	
+	        //title : {
+	        //    text : '지인지수 차트 : ' + classification
+	        //},
+	        
+	        yAxis: [{ // Primary yAxis
+	            labels: {
+	                format: '{value} %',
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            },
+	            title: {
+	                text: names[0],
+	                style: {
+	                    color: Highcharts.getOptions().colors[0]
+	                }
+	            },
+	            opposite: false
+			},{ // Primary yAxis
+	            labels: {
+	                format: '{value} %',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
+	            title: {
+	                text: "증감율",
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            }
+			}],
+	        series: seriesOptions
+	    });
+	}
+	
+	
 });
 /*]]>*/
 </script>
+<script th:src="@{/resources/js/sample-read-classification.js}" type="text/javascript"></script>
+

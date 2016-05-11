@@ -51,8 +51,12 @@ function onClickGoToMainPage(){
 	LoadAjaxContent(url);	
 }
 
+
 $(document).ready(function() {
 	// Load Datatables and run plugin on tables 
 	LoadDataTablesScripts(AllTables);
 	
 });
+
+
+

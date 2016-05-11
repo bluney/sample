@@ -121,8 +121,11 @@ $.widget( "ui.weekspinner", $.ui.spinner, {
 
 
 function ondblclickForClassfication(classification) {
-	var url = "/service/market/readClassification.html?classification=" + classification;
-	LoadAjaxContent(url);	
+	var url = "/#/service/market/readClassification.html?classification=" + classification;
+	//LoadAjaxContent(url);
+	window.location.href = url;
+	window.location.reload();
+	
 }
 
 $(document).ready(function() {
