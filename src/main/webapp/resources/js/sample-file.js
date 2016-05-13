@@ -11,8 +11,8 @@ $(function() {
 		chunk_size : '10mb',
 		// Resize images on clientside if we can
 		resize : {
-			width : 200,
-			height : 200,
+			width : 100,
+			height : 100,
 			quality : 90,
 			crop : true
 		},
