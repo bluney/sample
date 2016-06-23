@@ -5,13 +5,13 @@
 function importExcel(){
 	var specs = "left=10,top=10,width=900,height=600";
 	specs += ",toolbar=no,menubar=no,status=no,scrollbars=no,resizable=no";
-	window.open("/service/market/requestExcel", "시계열자료 가져오기", specs);	
+	window.open("/sample/service/market/requestExcel", "시계열자료 가져오기", specs);	
 }
 
 function analyzeMarketTimeSeries(){
 	$.ajax({
 		type : "GET",
-		url : "/service/market/analyzeMarketTimeSeries",
+		url : "/sample/service/market/analyzeMarketTimeSeries",
 		//data : {"code" : updateLevel},
 		success : function (response) {
 			//$("#level" + updateLevel + "Selector").html(response);
@@ -46,7 +46,7 @@ function calcurateRateOfEarning(){
 	
 	$.ajax({
 		type : "GET",
-		url : "/service/market/calcurateRateOfEarning",//+param,
+		url : "/sample/service/market/calcurateRateOfEarning",//+param,
 		data : {"rate" : rate,
 				"selling" : selling,
 				"lease" : lease,
@@ -60,7 +60,7 @@ function calcurateRateOfEarning(){
 function processBestCase() {
 	$.ajax({
 		type : "GET",
-		url : "/service/market/processBestCase",
+		url : "/sample/service/market/processBestCase",
 		success : function (response) {
 			//$("#level" + updateLevel + "Selector").html(response);
 		}
@@ -121,10 +121,10 @@ $.widget( "ui.weekspinner", $.ui.spinner, {
 
 
 function ondblclickForClassfication(classification) {
-	var url = "/#/service/market/readClassification.html?classification=" + classification;
-	//LoadAjaxContent(url);
-	window.location.href = url;
-	window.location.reload();
+	var url = "/service/market/readClassification.html?classification=" + classification;
+	LoadAjaxContent(url);
+//	window.location.href = url;
+//	window.location.reload();
 	
 }
 

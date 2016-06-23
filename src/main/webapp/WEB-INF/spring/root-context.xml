@@ -30,22 +30,21 @@
 	    <property name="jdbcUrl" value="jdbc:postgresql://localhost/sample"/>
 	    <property name="user" value="postgres"/>
 	    <property name="password" value="postgres"/>
-	</bean>	  -->
+	</bean>	 -->
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
       <property name="driverClass" value="com.mysql.jdbc.Driver"/>
       <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/kado79"/>
       <property name="user" value="kado79"/>
       <property name="password" value="wjdalsgk@@"/>
-    </bean>  
+    </bean>
   
 <!--     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
       <property name="driverClass" value="org.postgresql.Driver"/>
       <property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/sample"/>
       <property name="user" value="kado7979"/>
       <property name="password" value="wjdalsgk@@"/>
-    </bean> 
-	<util:properties id="prop" location="classpath:bluney/sample/sample/root-context.properties" /> -->
+    </bean> -->
 		
 	<!-- 
 	############################################################# 
