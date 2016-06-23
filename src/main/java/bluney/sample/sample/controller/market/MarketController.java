@@ -66,7 +66,7 @@ public class MarketController {
 //	@Autowired @Qualifier("earningStatRepository")
 //	private EntityRepository<EarningStat, Integer> earningStatRepository;
 	
-	@RequestMapping(value = "/market.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/market", method = RequestMethod.GET)
 	public String sampleMarket(@RequestParam HashMap<String, String> map, Model model) {
 //	public String sampleMarket(Locale locale, Model model) {
 		logger.warn("request method: find()");

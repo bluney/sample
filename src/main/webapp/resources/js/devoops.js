@@ -10,6 +10,7 @@
 // homepage: http://arshaw.com/fullcalendar
 // require moment.js
 //
+var baseUrl = "/sample";
 function LoadCalendarScript(callback){
 	function LoadFullCalendarScript(){
 		if(!$.fn.fullCalendar){
@@ -245,7 +246,7 @@ function LoadAjaxContent(url){
 	$('.preloader').show();
 	$.ajax({
 		mimeType: 'text/html; charset=utf-8', // ! Need set mimeType only when run from local file
-		url: url,
+		url: baseUrl + url,
 		type: 'GET',
 		success: function(data) {
 			$('#ajax-content').html(data);

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Springfield(strategy=Strategy.HIBERNATE)
+@Springfield(strategy=Strategy.HIBERNATE_REPOSITORY_ONLY)
 @Entity
 @Table(name="lease_rate")
 public @ToString @NoArgsConstructor @AllArgsConstructor class LeaseRateEntity extends Market {

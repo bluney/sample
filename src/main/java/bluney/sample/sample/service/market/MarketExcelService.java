@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +27,6 @@ import bluney.sample.sample.common.util.DataConvertUtil;
 import bluney.sample.sample.common.util.NullJudgeUtil;
 import bluney.sample.sample.customtype.market.Market;
 import bluney.sample.sample.customtype.market.MarketType;
-import bluney.sample.sample.domain.classification.ClassificationEntity;
 import bluney.sample.sample.domain.lease.price.LeasePriceEntity;
 import bluney.sample.sample.domain.lease.rate.LeaseRateEntity;
 import bluney.sample.sample.domain.selling.price.SellingPriceEntity;
@@ -47,9 +45,9 @@ public class MarketExcelService extends AbstractExcelService {
 
 	private final static String DELIM_CLASSFICATION = "-";
 
-	@Autowired
-	@Qualifier("leasePriceEntityRepository")
-	private EntityRepository<ClassificationEntity, Integer> classificationRepository;
+//	@Autowired
+//	@Qualifier("leasePriceEntityRepository")
+//	private EntityRepository<ClassificationEntity, Integer> classificationRepository;
 
 	@Autowired
 	@Qualifier("leasePriceEntityRepository")

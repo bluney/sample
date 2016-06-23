@@ -2,23 +2,23 @@
 	<navigation pattern="/service/bigdata/**" path="/service/bigdata/map_daum_sample.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="빅데이터">
 	</navigation>
 	
-	<navigation pattern="/service/market/**" path="/service/market/market.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="시장동향">
+	<navigation pattern="/service/market/**" path="/service/market/market" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="시장동향">
 	</navigation>
 
 
-	<navigation pattern="/service/fileUpload/**" path="/service/fileUpload" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="맞춤아파트">
+<!-- 	<navigation pattern="/service/fileUpload/**" path="/service/fileUpload" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="맞춤아파트">
 	</navigation>
-	
-	<navigation pattern="/service/report/**" path="/service/report" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="현장리포트">
+ -->	
+<!-- 	<navigation pattern="/service/report/**" path="/service/report" hide="true" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="현장리포트">
 	</navigation>
-
+ -->
 <!--	
 
 	<navigation pattern="/service/notice/**" path="/service/bigdata/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="알림마당">
 	
 	</navigation>
  -->
-	<navigation pattern="/security/**" path="/security/user/forgot/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="ACCOUNT">
+	<!-- <navigation pattern="/security/**" path="/security/user/forgot/new.html" hide="false" accessible="true" access="hasRole('ROLE_ANONYMOUS')" name="ACCOUNT">
 		<navigation pattern="/security/user/" name="사용자" accessible="true" access="anonymous">
 			<navigation pattern="/security/user/loginForm/**" path="/security/user/loginForm.html" name="로그인" hide="false" />
 			<navigation pattern="/security/user/register/**" path="/security/user/register/new.html" name="회원가입" />
@@ -36,5 +36,5 @@
 	<navigation pattern="/security/" path="/j_spring_security_logout" name="LOGOUT" accessible="true" access="authenticated">
 	</navigation>
 	<navigation pattern="/security/" path="/security/user/loginForm.html" name="LOGIN" accessible="true" access="anonymous">
-	</navigation>
+	</navigation> -->
 </navigation>

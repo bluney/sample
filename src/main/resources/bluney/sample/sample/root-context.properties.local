@@ -2,9 +2,12 @@
 # c3p0DataSource
 ################################
 c3p0DataSource.driver=org.postgresql.Driver
-c3p0DataSource.url=jdbc:postgresql://localhost:5432/sample
-c3p0DataSource.username=kado7979
-c3p0DataSource.password=wjdalsgk@@
+c3p0DataSource.url=jdbc:postgresql://localhost/sample
+c3p0DataSource.username=postgres
+c3p0DataSource.password=postgres
+c3p0DataSource.initialPoolSize=5
+c3p0DataSource.minPoolSize=5
+c3p0DataSource.maxPoolSize=10
 
 ################################
 # multipart
