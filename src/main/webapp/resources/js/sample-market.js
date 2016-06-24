@@ -2,6 +2,10 @@
  * 
  */
 
+$(document).ajaxComplete(function(){
+   $("#modal-overlay").hide();
+ });
+
 function importExcel(){
 	var specs = "left=10,top=10,width=900,height=600";
 	specs += ",toolbar=no,menubar=no,status=no,scrollbars=no,resizable=no";
@@ -9,13 +13,18 @@ function importExcel(){
 }
 
 function analyzeMarketTimeSeries(){
+  $("#modal-overlay").show();
 	$.ajax({
 		type : "GET",
 		url : "/sample/service/market/analyzeMarketTimeSeries",
 		//data : {"code" : updateLevel},
 		success : function (response) {
 			//$("#level" + updateLevel + "Selector").html(response);
-		}
+		  $("#modal-overlay").hide();
+		},
+	  error : function (request,status,error){
+	    $("#modal-overlay").hide();
+	  }
 	});		
 }
 
@@ -44,6 +53,7 @@ function calcurateRateOfEarning(){
 		return;
 	}
 	
+	$("#modal-overlay").show();
 	$.ajax({
 		type : "GET",
 		url : "/sample/service/market/calcurateRateOfEarning",//+param,
@@ -53,17 +63,26 @@ function calcurateRateOfEarning(){
 				"timing" : $('#input-spinner-timing').weekspinner("value")},
 		success : function (response) {
 			$("#divEarningRate").html(response);
-		}
+			$("#modal-overlay").hide();
+    },
+    error : function (request,status,error){
+      $("#modal-overlay").hide();
+    }
 	});		
 }
 
 function processBestCase() {
+  $("#modal-overlay").show();
 	$.ajax({
 		type : "GET",
 		url : "/sample/service/market/processBestCase",
 		success : function (response) {
 			//$("#level" + updateLevel + "Selector").html(response);
-		}
+		  $("#modal-overlay").hide();
+    },
+    error : function (request,status,error){
+      $("#modal-overlay").hide();
+    }
 	});	
 }
 
@@ -182,5 +201,5 @@ $(document).ready(function() {
 		step:4
 	}).width(60);
 	$("#input-spinner-timing").weekspinner("value", 104);
-
+	
 });

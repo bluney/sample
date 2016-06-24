@@ -70,9 +70,18 @@
       </div>
       <!--Start Content-->
       <div id="content" class="col-xs-12 col-sm-10">
-        <div id="ajax-content"></div>
+        <div id="ajax-content">
+          <div th:include="WEB-INF/fragments/login.html :: login"></div>
+        </div>
       </div>
       <!--End Content-->
+      <div id="modal-overlay" style="display:none;">
+        <div class="row">
+          <div class="col-md-2 col-md-offset-5">
+            <img th:src="@{/resources/img/devoops_getdata.gif}" class="devoops-getdata" alt="preloader" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!--End Container-->
@@ -87,7 +96,7 @@
   <script th:src="@{/resources/plugins/tinymce/jquery.tinymce.min.js}"></script>
   <!-- All functions for this theme + document.ready processing -->
   <script th:src="@{/resources/js/devoops.js}"></script>
-<!--   <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <!--   <script src="https://code.highcharts.com/stock/highstock.js"></script>
   <script src="https://code.highcharts.com/stock/modules/exporting.js"></script> -->
 </body>
 

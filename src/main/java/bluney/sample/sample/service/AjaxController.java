@@ -37,7 +37,7 @@ public class AjaxController {
 	@RequestMapping(value = "/ajax/dashboard.html", method = RequestMethod.GET)
 	public String dashboard(Locale locale, Model model) {
 	
-		return "/ajax/dashboard";
+		return "/ajax/dashboard.html";
 //		return "/loginForm";
 	}
 	

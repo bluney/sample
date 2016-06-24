@@ -29,10 +29,7 @@ public class MemberInfoService extends EntityServiceImpl<MemberInfo, MemberInfo>
 		String username = authenticationContext.getUsername();
 		Users user = usersRepository.findOne(username);
 		entity.setUsername(username);
-		entity.setDescription(user.getDescription());
-		entity.setPart(user.getPart());
 		entity.setPhone(user.getPhone());
-		entity.setTask(user.getTask());
 		entity.setEmail(user.getEmail());		
 		return entity;
 	}	
@@ -43,10 +40,7 @@ public class MemberInfoService extends EntityServiceImpl<MemberInfo, MemberInfo>
 
 		String username = authenticationContext.getUsername();
 		Users user = usersRepository.findOne(username);
-		user.setDescription(entity.getDescription());
-		user.setPart(entity.getPart());
 		user.setPhone(entity.getPhone());
-		user.setTask(entity.getTask());
 		user.setEmail(entity.getEmail());
 		
 		return entity;

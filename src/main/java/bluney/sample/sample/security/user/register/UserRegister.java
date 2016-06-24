@@ -19,11 +19,8 @@ public class UserRegister {
 	@Getter @Setter private @NotNull String username;
 	@Getter @Setter private @NotNull String password1;
 	@Getter @Setter private @NotNull String password2;
-	@Getter @Setter private @NotNull String description;
 	@Getter @Setter private @NotNull Role role;
-	@Getter @Setter private @NotNull String part;
 	@Getter @Setter private @NotNull String phone;
-	@Getter @Setter private @NotNull String task;
 	@Getter @Setter private @NotNull String email;
 	
 	

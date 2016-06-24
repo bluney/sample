@@ -14,7 +14,7 @@
 	<logger name="org.springframework" level="OFF" /> 
 	<logger name="org.springframework.data" level="OFF" /> 
 	<logger name="org.springframework.security" level="OFF" />
-	<logger name="com.u2ware.springfield" level="INFO" />
+	<logger name="com.u2ware.springfield" level="OFF" />
 	
 	<logger name="bluney.sample.sample" level="DEBUG" />
 

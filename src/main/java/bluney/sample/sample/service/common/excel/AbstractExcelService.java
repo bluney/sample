@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import bluney.sample.sample.common.util.ImportExcel;
+import bluney.sample.sample.common.excel.ImportExcel;
 import lombok.Getter;
 import lombok.Setter;
 

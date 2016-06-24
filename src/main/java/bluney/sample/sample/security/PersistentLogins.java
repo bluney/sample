@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-@Springfield(strategy=Strategy.JPA_REPOSITORY_ONLY)
+@Springfield(strategy=Strategy.HIBERNATE_REPOSITORY_ONLY)
 @Entity
 public class PersistentLogins implements Serializable{
 

@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Springfield(
-	strategy=Strategy.JPA,
+	strategy=Strategy.HIBERNATE,
 	entity=Users.class,
 	methodLevelMapping={"*.html"}
 )

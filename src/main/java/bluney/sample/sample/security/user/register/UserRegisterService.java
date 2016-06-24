@@ -35,27 +35,20 @@ public class UserRegisterService extends EntityServiceImpl<UserRegister, UserReg
 		String username = entity.getUsername();
 		String salt = authenticationContext.getPasswordSalt();
 		String password = authenticationContext.getPassword(entity.getPassword1(), salt);
-		String description = entity.getDescription();		
 		Role role = entity.getRole();
-		String part = entity.getPart();
 		String phone = entity.getPhone();
-		String task = entity.getTask();
 		String email = entity.getEmail();
 		
 		Users user = new Users();
 		user.setSalt(salt);
 		user.setUsername(username);
 		user.setPassword(password);
-		user.setDescription(description);
 		user.setRole(role.toString());
-		user.setPart(part);
 		user.setPhone(phone);
-		user.setTask(task);
 		user.setEmail(email);
 		usersRepository.save(user);
 		
 		
-		System.out.println("level - 3");
 		for(GrantedAuthority authority : role.getAuthorities()){
 			authoritiesRepository.save(new Authorities(username, authority.getAuthority()));
 		}

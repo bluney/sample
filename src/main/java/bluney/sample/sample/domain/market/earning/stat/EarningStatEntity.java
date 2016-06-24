@@ -7,13 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.springframework.data.annotation.Transient;
-
 import com.u2ware.springfield.config.Springfield;
 import com.u2ware.springfield.config.Springfield.Strategy;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Springfield(strategy=Strategy.HIBERNATE)
 @Entity
@@ -35,11 +34,4 @@ public class EarningStatEntity {
 	private @Getter @Setter double averageTotal;
 	private @Getter @Setter double averagePerYear;
 		
-	@Transient
-	@Override
-	public String toString() {
-		return "EarningStat [id=" + id
-				 + ", rate=" + rate + ", selling=" + selling + ", lease=" + lease + ", interval=" + interval 
-				 + ", numOfIncrease=" + numOfIncrease + ", numOfDecrease=" + numOfDecrease + ", averageTotal=" + averageTotal + ", averagePerYear=" + averagePerYear + "]";
-	}
 }

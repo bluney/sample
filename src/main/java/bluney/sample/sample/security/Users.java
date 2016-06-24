@@ -20,7 +20,7 @@ import lombok.Setter;
 
 
 
-@Springfield(strategy=Strategy.JPA_REPOSITORY_ONLY)
+@Springfield(strategy=Strategy.HIBERNATE_REPOSITORY_ONLY)
 @Entity
 public class Users implements UserDetails{
 
@@ -40,11 +40,11 @@ public class Users implements UserDetails{
 	@Getter @Setter private boolean accountNonLocked = true;
 	@Getter @Setter private boolean credentialsNonExpired = true;
 	@Getter @Setter private @NotNull String salt;
-	@Getter @Setter private @NotNull String description;
+//	@Getter @Setter private @NotNull String description;
 	@Getter @Setter private @NotNull String role;	
-	@Getter @Setter private @NotNull String part;
+//	@Getter @Setter private @NotNull String part;
 	@Getter @Setter private @NotNull String phone;
-	@Getter @Setter private @NotNull String task;
+//	@Getter @Setter private @NotNull String task;
 	@Getter @Setter private @NotNull String email;
 	
 
@@ -82,13 +82,10 @@ public class Users implements UserDetails{
 	public String toString() {
 		return "Users [username=" + username 
 				+ ", password=" + password
-				+ ", description=" + description
 				+ ", enabled=" + enabled 
 				+ ", role=" + role 
 				+ ", salt=" + salt 
-				+ ", part=" + part 
 				+ ", phone=" + phone
-				+ ", task=" + task
 				+ ", email=" + email + "]";
 	}
 	

@@ -15,7 +15,7 @@ import com.u2ware.springfield.config.Springfield.Strategy;
 import lombok.Getter;
 import lombok.Setter;
 
-@Springfield(strategy=Strategy.JPA_REPOSITORY_ONLY)
+@Springfield(strategy=Strategy.HIBERNATE_REPOSITORY_ONLY)
 @Entity
 @SuppressWarnings("serial")
 public class GroupMembers implements Serializable{

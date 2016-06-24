@@ -105,85 +105,7 @@ table, td {
       <div class="span9">
         <h3>회원가입</h3>
         <br />
-        <!--  <form id="entity" name="entity" class="form-horizontal border-example" 
-			  th:action="@{ ${'createForm' == command_method} ? ${model_information.getTopLevelMapping()}+'/new'+${command_extension} : ${model_information.getTopLevelMapping()}+'/'+${command_id_path}+'/edit'+${command_extension}  }" 
-			  th:object="${model_entity}" method="post"  >
-			<input type="hidden" name="_method" value="post" />
-			<table width="100%" border="0px" cellpadding="12px" cellspacing="25px">
-					<colgroup>
-						<col width="15%" />
-						<col width="85%" />
-					</colgroup>
-
-					
-					<tr>
-						<th style="text-align: right;">사용자ID</th>
-						<td>
-							<input type="text" name="username" id="username" class="input" style="width: 25%" />
-						</td>
-					</tr>							
-					<tr>
-						<th style="text-align: right;">비밀번호</th>
-						<td>
-							<input type="password" name="password"	id="password" class="input" style="width: 25%" />
-						</td> 
-					</tr>
-					<tr>
-						<th style="text-align: right;">비밀번호 확인</th>
-						<td>
-							<input type="password" name="password"	id="password" class="input" style="width: 25%" />
-						</td>
-					</tr>
-					<tr>
-						<th style="text-align: right;">권한부여</th>
-						<td>
-							<input type="text" name="role"	id="role" class="input" style="width: 25%" />
-							<input type="radio" name="role" id="role" value="ADMIN"/> 관리자 &nbsp;&nbsp;
-							<input type="radio" name="role" id="role" value="USER"/> 사용자 &nbsp;&nbsp;
-							<input type="radio" name="role" id="role" value="GUEST" checked="checked"/> 게스트
-						</td>
-					</tr>
-					<tr>
-						<th style="text-align: right;">부서</th>
-						<td>
-							<input type="text" name="part"	id="part" class="input" style="width: 25%" />
-						</td>
-					</tr>
-					<tr>
-						<th style="text-align: right;">연락처</th>
-						<td>
-							<input type="text" name="phone"	id="phone" class="input" style="width: 25%" />
-						</td>
-					</tr>
-					<tr>
-						<th style="text-align: right;">직무</th>
-						<td>
-							<input type="text" name="task"	id="task" class="input" style="width: 25%" />
-						</td>
-					</tr>
-					<tr>
-						<th style="text-align: right;">이메일</th>
-						<td>
-							<input type="text" name="email"	id="email" class="input" style="width: 10%" />&nbsp;&nbsp;@koreaaero.com
-						</td>
-					</tr>					
-				</table>
-				<br/>	
-					
-				<div class="control-group">
-					<div class="controls" >
-				    	<button class="btn"  type="submit" th:text="#{application.save}"/>
-				    	<button class="btn"  type="reset" th:text="#{application.reset}" />
-				    	<input class="btn" type="button" onclick="location.href ='/scm/security/user/loginForm.html'" value="이전페이지" />
-					</div>
-				</div>
-			</form> -->
-
-
-
-
-
-        <form id="entity" name="entity" class="form-horizontal border-example" th:action="@{ ${'createForm' == command_method} ? ${model_information.getTopLevelMapping()}+'/new'+${command_extension} : ${model_information.getTopLevelMapping()}+'/'+${command_id_path}+'/edit'+${command_extension}  }" th:object="${model_entity}" method="post">
+          <form id="entity" name="entity" class="form-horizontal border-example" th:action="@{ ${'createForm' == command_method} ? ${model_information.getTopLevelMapping()}+'/new'+${command_extension} : ${model_information.getTopLevelMapping()}+'/'+${command_id_path}+'/edit'+${command_extension}  }" th:object="${model_entity}" method="post">
 
           <input type="hidden" name="_method" th:value="${'updateForm' == command_method} ? 'put' : 'post' " />
 
@@ -193,30 +115,18 @@ table, td {
               <span th:case="'username'">아이디</span>
               <span th:case="'password1'">패스워드</span>
               <span th:case="'password2'">패스워드 확인</span>
-              <span th:case="'description'">요 약</span>
-              <span th:case="'role'">사용자권한</span>
-              <span th:case="'part'">부 서</span>
               <span th:case="'phone'">연락처</span>
-              <span th:case="'task'">직 무</span>
               <span th:case="'email'">이메일</span>
             </label>
             <div class="controls" th:switch="${attr.name}">
               <input th:case="'username'" type="text" name="username" id="username" class="input" th:field="*{username}" />
               <input th:case="'password1'" type="password" name="password1" id="password1" class="input" />
               <input th:case="'password2'" type="password" name="password2" id="password2" class="input" />
-              <input th:case="'description'" type="text" name="description" id="description" class="input" th:field="*{description}" />
-              <div th:case="'role'">
-                <input type="radio" name="role" id="role" value="ADMIN" /> 관리자 &nbsp;&nbsp;
-                <input type="radio" name="role" id="role" value="USER" /> 사용자 &nbsp;&nbsp;
-                <input type="radio" name="role" id="role" value="ANONYMOUS" /> 게스트
-              </div>
-              <input th:case="'part'" type="text" name="part" id="part" class="input" th:field="*{part}"/>
               <input th:case="'phone'" type="text" name="phone" id="phone" class="input" th:field="*{phone}"/>
-              <input th:case="'task'" type="text" name="task" id="task" class="input" th:field="*{task}"/>
               <div th:case="'email'">
-                <input type="text" name="email" id="email" class="input" th:field="*{email}"/> &nbsp;&nbsp;@koreaaero.com
+                <input type="text" name="email" id="email" class="input" th:field="*{email}"/> 
               </div>
-
+              <input type="hidden" name="role" id="role" value="USER" />
               <!-- <input type="text" th:field="*{__${attr['name']}__}" th:readonly="${attr['id'] and ('createForm' != command_method) } ? 'readonly'"/> -->
               <span class="help-inline" th:errors="*{__${attr['name']}__}"></span>
             </div>
@@ -231,32 +141,6 @@ table, td {
           </div>
         </form>
 
-
-        <!-- <form id="entity" name="entity" class="form-horizontal border-example" th:action="@{ ${'createForm' == command_method} ? ${model_information.getTopLevelMapping()}+'/new'+${command_extension} : ${model_information.getTopLevelMapping()}+'/'+${command_id_path}+'/edit'+${command_extension}  }" th:object="${model_entity}" method="post"  >
-
-				<input type="hidden" name="_method" th:value="${'updateForm' == command_method} ? 'put' : 'post' "/>	
-
-				IDs
-				<div th:if="${attr['editable']}" th:each="attr : ${model_information.getEntityAttributes()}"
-					 th:class="${#fields.hasErrors('__${attr['name']}__')} ? 'control-group error' : 'control-group'">
-											
-					<label class="control-label">
-						<i th:if="${attr['id']}" class="icon-star"></i> <span th:text="${attr['name']}"/>
-					</label>
-					<div class="controls" >
-						<input type="text" th:field="*{__${attr['name']}__}" th:readonly="${attr['id'] and ('createForm' != command_method) } ? 'readonly'"/>
-						<span class="help-inline" th:errors="*{__${attr['name']}__}" ></span>
-					</div>
-				</div>
-				<div class="control-group">
-					<div class="controls" >
-				    	<button class="btn"  type="submit" th:text="#{application.save}"/>
-				    	<button class="btn"  type="reset" th:text="#{application.reset}"/>
-					</div>
-				</div>
-			</form> -->
-
-
       </div>
       <!--/span9-->
     </div>
@@ -266,28 +150,11 @@ table, td {
 
 
     <footer>
-      <p align="right">&copy;훈련체계 운영팀 선행연구 파트 2015</p>
+      <p align="right">&copy;aptgin.com</p>
     </footer>
 
   </div>
   <!--/.fluid-container-->
-
-  <!-- Le javascript
-    ================================================== -->
-  <!--     Placed at the end of the document so the pages load faster
-    <script src="http://getbootstrap.com/2.3.2/assets/js/jquery.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script> -->
 
 </body>
 </html>
