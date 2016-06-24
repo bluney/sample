@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+</head>
+<body>
+
+  <div th:fragment="login">
+    <div class="row">
+      <div id="breadcrumb" class="col-xs-12">
+        <ol class="breadcrumb">
+          <li>
+            <a href="index.html">Home</a>
+          </li>
+          <li>
+            <a href="#">Login</a>
+          </li>
+        </ol>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+          <div class="box">
+            <div class="box-header">
+              <div class="box-name"></div>
+              <div class="no-move"></div>
+            </div>
+            <div class="box-content">
+
+              <form th:unless="${principal}" th:action="@{'/j_spring_security_check'}" method="post" class="form-horizontal border-example">
+                <div class="text-center">
+                  <h2 class="form-signin-heading">Please sign in</h2>
+                  <p />
+                  <input type="text" id="pageNumber" name="j_username" value="" class="form-control" placeholder="id" required="required" autofocus="autofocus"></input>
+                  <input type="password" id="pageNumber" name="j_password" value="" class="form-control" placeholder="Password" required="required"></input>
+
+                  <p></p>
+                  <button class="btn btn-primary" type="submit">로그인</button>
+                  
+                  <p />
+                  <p />                  
+                  <div th:class="'control-group '+ (${errorCode} ? ' error')" th:if="${errorCode}">
+                    <div class="controls">
+                      <span class="text-danger" th:text="${errorCode}"></span>
+                    </div>
+                    <div class="controls">
+                      <span class="text-danger" th:if="${'authentication-failure' == errorCode}" th:text="@{비밀번호 입력이 잘못되었습니다.}"></span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+              <form th:if="${principal}" th:action="@{'/j_spring_security_logout'}" method="get" class="form-horizontal border-example">
+                <div class="text-center">
+                  <div th:class="'control-group '+ (${errorCode} ? ' error')" th:if="${errorCode}">
+                    <div class="controls">
+                      <span class="help-inline" th:text="${errorCode}"></span>
+                    </div>
+                    <p>비밀번호 입력이 잘못되었습니다.</p>
+                  </div>
+                  <h1></h1>
+                  <h2 align="left">환영합니다~</h2>
+                  <div class="controls">사용자</div>
+                  <p th:text="${principal.username}" />
+
+                  <div class="controls">
+                    사용자 권한
+                    <p th:text="${principal.role}" />
+                  </div>
+
+                  <div class="control-group">
+                    <div class="controls">
+                      <input type="submit" value="Logout" style="width: 100px;" />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
